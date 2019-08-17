@@ -54,8 +54,12 @@ const App = {
 	console.log("this.account: ", this.account);	
 	console.log("balance: ", balance);	
 
+    const accountElement = document.getElementsByClassName("account")[0];
+    accountElement.innerHTML = this.account;
+
     const balanceElement = document.getElementsByClassName("balance")[0];
     balanceElement.innerHTML = balance;
+
   },
 
   sendCoin: async function() {
