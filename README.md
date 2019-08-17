@@ -1,30 +1,30 @@
 # PEC 1 - Diseño y Desarrollo II
 ### Alumno: Jesús A. Leal Pérez
-
-#Dapp - Recolección de Envases para Reciclaje#
+---
+# Dapp - Recolección de Envases para Reciclaje
 
 En construcción...
 
-###Indice
+### Indice
 ...
 
-###Acerca esta Dapp
+### Acerca esta Dapp
 ...
 
-###Estructura
+### Estructura
 ...
 
-###¿Cómo instalar y configurar?
+### ¿Cómo instalar y configurar?
 ...
 
-####Versiones programas utilizados
+#### Versiones programas utilizados
 ...
 
-###Casos de uso
+### Casos de uso
 ...
 
-###¿Cómo utilizar la Dapp?
+### ¿Cómo utilizar la Dapp?
 ...
 
-###Pruebas
+### Pruebas
 ...

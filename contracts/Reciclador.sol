@@ -19,6 +19,10 @@ contract UserFactory {
 
     Mvt[] mvts;
 
+    event newMovement(
+        address indexed _owner, address indexed _contract, uint _amount, uint _balance, uint _cont
+    );
+
     constructor(address _owner) public {
         owner = _owner;
         factory = msg.sender;
@@ -30,6 +34,8 @@ contract UserFactory {
 
         cont = SafeMath.add32(cont,1);
         balance = SafeMath.add(balance,_amount);
+
+        emit newMovement(owner, address(this), _amount, balance, cont);
     }
 
     function getMovement(uint _ind) external view returns(uint, uint) {
