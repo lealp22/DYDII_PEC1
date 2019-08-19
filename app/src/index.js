@@ -1,6 +1,5 @@
 //import Web3 from "web3";
-//import metaCoinArtifact from "../../build/contracts/MetaCoin.json";
-//import metaCoinArtifact from "../MetaCoin.json";
+//import recyclerArtifact from "../../build/contracts/Recycler.json";
 
 const App = {
   web3: null,
@@ -20,9 +19,9 @@ const App = {
       try {
           // get contract instance
           const networkId = await web3.eth.net.getId();
-          const deployedNetwork = metaCoinArtifact.networks[networkId];
+          const deployedNetwork = recyclerArtifact.networks[networkId];
           this.meta = new web3.eth.Contract(
-              metaCoinArtifact.abi,
+              recyclerArtifact.abi,
               deployedNetwork.address,
           );
 
