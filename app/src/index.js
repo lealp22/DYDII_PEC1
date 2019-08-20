@@ -1,5 +1,5 @@
-//import Web3 from "web3";
-//import recyclerArtifact from "../../build/contracts/Recycler.json";
+import Web3 from "web3";
+import recyclerArtifact from "../../build/contracts/Recycler.json";
 
 const App = {
   web3: null,
@@ -7,9 +7,7 @@ const App = {
   meta: null,
 
   start: async function() {
-      const {
-          web3
-      } = this;
+      const { web3 } = this;
 
       // Log
       console.log("** start **");
@@ -38,18 +36,23 @@ const App = {
           console.log("Account: ", this.account);
           console.log("Accounts: ", accounts);
 
+          const accountIdElement = document.getElementById("cuenta");
+          accountIdElement.innerHTML = this.account;
+
+          const networkIdElement = document.getElementById("red");
+          networkIdElement.innerHTML = networkId;
+
           this.refreshBalance();
       } catch (error) {
           console.error("Could not connect to contract or chain.");
           // Log
           console.log("error: ", error);
+          this.setStatus("Could not connect to contract or chain.");
       }
   },
 
   refreshBalance: async function() {
-      const {
-          getBalance
-      } = this.meta.methods;
+      const { getBalance } = this.meta.methods;
       const balance = await getBalance(this.account).call();
 
       // Log
@@ -57,12 +60,12 @@ const App = {
       console.log("this.account: ", this.account);
       console.log("balance: ", balance);
 
-      const balanceElement = document.getElementsByClassName("balance")[0];
+      const balanceElement = document.getElementById("saldo");
       balanceElement.innerHTML = balance;
   },
 
   sendCoin: async function() {
-      const amount = parseInt(document.getElementById("amount").value);
+      const amount = parseInt(document.getElementById("price").value);
       const receiver = document.getElementById("receiver").value;
 
       // Log
@@ -72,13 +75,13 @@ const App = {
 
       this.setStatus("Initiating transaction... (please wait)");
 
-      const {
-          sendCoin
-      } = this.meta.methods;
-      await sendCoin(receiver, amount).send({
+      const { sendCoin } = this.meta.methods;
+      await sendCoin(amount);
+      /*
+      await sendCoin(amount).send({
           from: this.account
       });
-
+      */
       this.setStatus("Transaction complete!");
       this.refreshBalance();
   },
@@ -161,6 +164,12 @@ function isEmpty(valor) {
   }
 };
 
+function showMessage(message) {
+
+    const status = document.getElementById("status");
+    status.innerHTML = message;
+};
+
 window.App = App;
 
 window.addEventListener("load", function() {
@@ -173,10 +182,12 @@ window.addEventListener("load", function() {
       // use MetaMask's provider
       App.web3 = new Web3(window.ethereum);
       window.ethereum.enable(); // get permission to access accounts
+      showMessage("Web3 detected");
   } else {
       console.warn(
           "No web3 detected. Falling back to http://127.0.0.1:9545. You should remove this fallback when you deploy live",
       );
+      showMessage("No web3 detected. Falling back to http://127.0.0.1:9545");
       // fallback - use your fallback strategy (local node / hosted node + in-dapp id mgmt / fail)
       App.web3 = new Web3(
           new Web3.providers.HttpProvider("http://127.0.0.1:9545"),
