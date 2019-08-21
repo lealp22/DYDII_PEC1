@@ -89,37 +89,85 @@ const App = {
   buscarCodigo: async function() {
       const codigo      = document.getElementById("codigo").value;
       const description = document.getElementById("description");
+      const prefix = 'https://api.mlab.com/api/1/databases/productos/collections/';
+      const apiKey = '1KuXCnUSqfOGDAoKSZHENTSFBBlu4d6n';
+
+      let priceRequest = 1;
 
       console.log("Buscando codigo: ", codigo);
 
       if (!isEmpty(codigo)) {
 
-          description.value = "unknow";
+          description.value = "Buscando...";
           
           // Create a request variable and assign a new XMLHttpRequest object to it.
-          let request = new XMLHttpRequest()
+          let request = new XMLHttpRequest();
+          let requestHttp = prefix.concat('products?q={"product":"',codigo,'"}&apiKey=',apiKey);
+          
+          // Log
+          console.log("** XMLHttpRequest **");
+          console.log("requestHttp: ", requestHttp);
 
           // Open a new connection, using the GET request on the URL endpoint
-          request.open('GET', 'https://api.mlab.com/api/1/databases/productos/collections/products?q={"product": "8411547001009"}&apiKey=1KuXCnUSqfOGDAoKSZHENTSFBBlu4d6n', true)
+          request.open('GET',requestHttp,true);
 
           request.onload = function() {
-              // Begin accessing JSON data here
+
               // Begin accessing JSON data here
               let data = JSON.parse(this.response);
               
               console.log("data: ", data);
               console.log("Request.status: ", request.status);
 
-              if (request.status >= 200 && request.status < 400) {
-                  description.value = data[0].description
+              if (request.status >= 200 && request.status < 400 && data.length > 0) {
+
+                    description.value = data[0].description
+                    let idFee = data[0].id_fee;
+
+                    // Create a request variable and assign a new XMLHttpRequest object to it.
+                    let request2 = new XMLHttpRequest();
+                    let requestHttp2 = prefix.concat('prices?q={"id_fee":"',idFee,'"}&apiKey=',apiKey);
+                    //let requestHttp2 = 'https://api.mlab.com/api/1/databases/productos/collections/prices?q={"id_fee":"'||
+                    //                    idFee || '"}&apiKey=' || apiKey;
+
+                    // Log
+                    console.log("** XMLHttpRequest2 **");
+                    console.log("requestHttp2: ", requestHttp2);
+
+                    // Open a new connection, using the GET request on the URL endpoint
+                    request2.open('GET', requestHttp2, true);
+
+                    request2.onload = function() {
+
+                        // Begin accessing JSON data here
+                        let data = JSON.parse(this.response);
+                    
+                        // Log
+                        console.log("data: ", data);
+                        console.log("Req// Log ", request2.status);
+
+                        if (request2.status >= 200 && request2.status < 400 && data.length > 0) {
+                            priceRequest = data[0].precio;
+                        } else {
+                            console.log('ERROR: Tarifa no encontrada');
+                        }
+                   }  
+
+                   // Send request
+                   request2.send() 
+                  
               } else {
-                  console.log('error')
+                   console.log('Código no encontrado');
+                   description.value = "unknown";
               }
+
+              price.value = priceRequest;
           }
 
           // Send request
           request.send();
           
+          /*
           // Create a request variable and assign a new XMLHttpRequest object to it.
           let request2 = new XMLHttpRequest()
 
@@ -144,7 +192,11 @@ const App = {
 
           // Send request
           request2.send()            
-  
+          */
+      } else {
+          this.setStatus("Error: En necesario indicar un código.");
+          price.value = 0;
+          description.value = "";
       }
   },
 
