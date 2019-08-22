@@ -5,6 +5,9 @@ const App = {
   web3: null,
   account: null,
   meta: null,
+  prodCode: null,
+  prodFee: null,
+  prodQty: null,
 
   start: async function() {
       const { web3 } = this;
@@ -66,43 +69,47 @@ const App = {
 
   sendCoin: async function() {
       const amount = parseInt(document.getElementById("price").value);
-      const receiver = document.getElementById("receiver").value;
+      //const receiver = document.getElementById("receiver").value;
+      this.prodQty = parseInt(document.getElementById("cantidad").value);
+      this.prodUni = document.getElementById("medida").value;
 
       // Log
       console.log("** sendCoin **");
       console.log("amount: ", amount);
-      console.log("receiver: ", receiver);
-
+      //console.log("receiver: ", receiver);
+      console.log("codigo: ", this.prodCode);
+      console.log("fee: ",this.prodFee);
+      console.log("cantidad: ", this.prodQty);
+      console.log("unidad: ", this.prodUni);
+;
       this.setStatus("Initiating transaction... (please wait)");
 
       const { sendCoin } = this.meta.methods;
-      await sendCoin(amount);
-      /*
-      await sendCoin(amount).send({
+      await sendCoin(this.prodCode, this.prodFee, this.prodQty, this.prodUni).send({
           from: this.account
       });
-      */
+      
       this.setStatus("Transaction complete!");
       this.refreshBalance();
   },
 
   buscarCodigo: async function() {
-      const codigo      = document.getElementById("codigo").value;
+      this.prodCode = document.getElementById("codigo").value;
       const description = document.getElementById("description");
       const prefix = 'https://api.mlab.com/api/1/databases/productos/collections/';
       const apiKey = '1KuXCnUSqfOGDAoKSZHENTSFBBlu4d6n';
 
       let priceRequest = 1;
 
-      console.log("Buscando codigo: ", codigo);
+      console.log("Buscando codigo: ", this.prodCode);
 
-      if (!isEmpty(codigo)) {
+      if (!isEmpty(this.prodCode)) {
 
           description.value = "Buscando...";
           
           // Create a request variable and assign a new XMLHttpRequest object to it.
           let request = new XMLHttpRequest();
-          let requestHttp = prefix.concat('products?q={"product":"',codigo,'"}&apiKey=',apiKey);
+          let requestHttp = prefix.concat('products?q={"product":"',this.prodCode,'"}&apiKey=',apiKey);
           
           // Log
           console.log("** XMLHttpRequest **");
@@ -122,13 +129,13 @@ const App = {
               if (request.status >= 200 && request.status < 400 && data.length > 0) {
 
                     description.value = data[0].description
-                    let idFee = data[0].id_fee;
+                    this.prodFee = data[0].id_fee;
 
                     // Create a request variable and assign a new XMLHttpRequest object to it.
                     let request2 = new XMLHttpRequest();
-                    let requestHttp2 = prefix.concat('prices?q={"id_fee":"',idFee,'"}&apiKey=',apiKey);
+                    let requestHttp2 = prefix.concat('prices?q={"id_fee":"',this.prodFee,'"}&apiKey=',apiKey);
                     //let requestHttp2 = 'https://api.mlab.com/api/1/databases/productos/collections/prices?q={"id_fee":"'||
-                    //                    idFee || '"}&apiKey=' || apiKey;
+                    //                    this.prodFee || '"}&apiKey=' || apiKey;
 
                     // Log
                     console.log("** XMLHttpRequest2 **");
@@ -218,8 +225,10 @@ function isEmpty(valor) {
 
 function showMessage(message) {
 
+    console.log("Entrando showMessage function");
     const status = document.getElementById("status");
     status.innerHTML = message;
+    console.log("Saliendo showMessage function");
 };
 
 window.App = App;
