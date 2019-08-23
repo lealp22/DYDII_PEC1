@@ -14,8 +14,12 @@ contract UserFactory {
     uint32  cont;
 
     struct Mvt {
-        uint   mvtoAmount;
-        uint   mvtoDate;
+        string code;
+        string fee;
+        uint32 qty;
+        string uni;
+        uint   amount;
+        uint   date;
     }
 
     Mvt[] mvts;
@@ -29,21 +33,45 @@ contract UserFactory {
         factory = msg.sender;
     }
 
-    function addMovement(uint _amount) public {
-        mvts[cont].mvtoAmount = _amount;
-        mvts[cont].mvtoDate = now;
+    function addMovement(string memory _code, string memory _fee, uint32 _qty, string memory _uni, uint _amount) public {
+        require(_qty > 0,"quantity is not greater than zero");
+        require(_qty < 1000,"quantity is too high");
+        require(bytes(_code).length > 0,"package code is empty");
+        require(bytes(_uni).length > 0,"unit code is empty");
 
+        Mvt memory _tx;
+
+        // Si el código de comisión está vacío, los campos amount y qty deben ser iguales (price=1)
+        if (bytes(_fee).length == 0 && _amount != _qty) {
+            revert("Price does not correspond with a empty fee");
+        }
+
+        _tx.code   = _code;
+        _tx.fee    = _fee;
+        _tx.qty    = _qty;
+        _tx.uni    = _uni;
+        _tx.amount = _amount;
+        _tx.date   = now;
+
+        // Incluimos la transacción en el array de movimientos
+        mvts.push(_tx);
+
+        // Actualizamos el contador de movimientos y el saldo
         cont = SafeMath.add32(cont,1);
-        balance = SafeMath.add(balance,_amount);
+        balance = SafeMath.add(balance, _tx.amount);
 
-        emit newMovement(owner, address(this), _amount, balance, cont);
+        //emit evento creación nuevo movimiento
+        emit newMovement(owner, address(this), _tx.amount, balance, cont);
     }
 
-    function getMovement(uint _ind) external view returns(uint, uint) {
+    function getMovement(uint _ind) external view returns(string memory, string memory, uint32, string memory, uint, uint) {
         require (_ind > 0,"value must be greater than zero");
-        require (_ind <= cont+1, "value is higher than last movement index");
+        require (_ind <= cont, "value is higher than last movement index");
 
-        return (mvts[_ind].mvtoAmount, mvts[_ind].mvtoDate);
+        uint pos = SafeMath.sub(_ind, 1);
+
+        //return (mvts[pos]);
+        return (mvts[pos].code, mvts[pos].fee, mvts[pos].qty, mvts[pos].uni, mvts[pos].amount, mvts[pos].date);
     }
 
 }
@@ -60,9 +88,17 @@ contract Recycler is Pausable, usingProvable {
         UserFactory userContr;
     }
 
+    struct Mvt {
+        string code;
+        string fee;
+        uint32 qty;
+        string uni;
+    }
+
     uint32 contUsers;
     uint   globalBalance;
     uint   price;
+    Mvt    trans;
 
     mapping (uint => address) private listaUsers;
     mapping (address => User) private users;
@@ -76,7 +112,7 @@ contract Recycler is Pausable, usingProvable {
     );
 
     //event LogConstructorInitiated(string nextStep);
-    event LogPriceUpdated(string price);
+    event LogPriceUpdated(string _result);
     event LogNewProvableQuery(string description);
 
     constructor() public {
@@ -85,15 +121,38 @@ contract Recycler is Pausable, usingProvable {
         addBalance(10000);
     }
 
-    function sendCoin(uint _amount) public {
-        require(_amount > 0,"amount is not greater than zero");
-        require(_amount < 10000,"amount is too high");
+    function sendCoin(string memory prodCode, string memory prodFee, uint32 prodQty, string memory prodUni) public {
+        require(prodQty > 0,"quantity is not greater than zero");
+        require(prodQty < 1000,"quantity is too high");
+        //require(bytes(prodFee).length > 0,"fee code is empty");
+        require(bytes(prodCode).length > 0,"package code is empty");
+        require(bytes(prodUni).length > 0,"unit code is empty");
+
+        trans.code = prodCode;
+        trans.fee = prodFee;
+        trans.qty = prodQty;
+        trans.uni = prodUni;
+        //trans.date = 0;
+        //trans.amount = 0;
+
+        if (bytes(prodFee).length > 0) {
+            fetchPrice(prodFee);
+        } else {
+            price = 1;
+            sendCoin_cont();
+        }
+    }
+
+    function sendCoin_cont() internal {
+
+        uint _amount = SafeMath.mul(trans.qty, price);
 
         createUser();
         users[msg.sender].dtUltMvt = block.timestamp;
         users[msg.sender].contMvts = SafeMath.add32(users[msg.sender].contMvts, 1);
 
-        users[msg.sender].userContr.addMovement(_amount);
+        //users[msg.sender].userContr.addMovement(trans);
+        users[msg.sender].userContr.addMovement(trans.code, trans.fee, trans.qty, trans.uni, _amount);
         addBalance(_amount);
     }
 
@@ -163,13 +222,15 @@ contract Recycler is Pausable, usingProvable {
        if (msg.sender != provable_cbAddress()) revert();
        price = parseInt(_result);
        emit LogPriceUpdated(_result);
+
+       sendCoin_cont();
    }
 
-   function updatePrice(string memory _fee) public payable {
+   function fetchPrice(string memory _fee) public payable {
        require(bytes(_fee).length > 0,"fee code is empty");
 
        if (provable_getPrice("URL") > address(this).balance) {
-           emit LogNewProvableQuery("Provable query was NOT sent, please add some ETH to cover for the query fee");
+           emit LogNewProvableQuery("Provable letquery was NOT sent, please add some ETH to cover for the query fee");
        } else {
            string memory _url = string(abi.encodePacked("json(https://api.mlab.com/api/1/databases/productos/collections/fees?apiKey=1KuXCnUSqfOGDAoKSZHENTSFBBlu4d6n).0.result.", _fee, ".price"));
 

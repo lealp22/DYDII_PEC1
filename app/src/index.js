@@ -131,6 +131,9 @@ const App = {
                     description.value = data[0].description
                     this.prodFee = data[0].id_fee;
 
+                    // Log
+                    console.log("prodFee:",this.prodFee);
+
                     // Create a request variable and assign a new XMLHttpRequest object to it.
                     let request2 = new XMLHttpRequest();
                     let requestHttp2 = prefix.concat('prices?q={"id_fee":"',this.prodFee,'"}&apiKey=',apiKey);
@@ -168,7 +171,7 @@ const App = {
                    description.value = "unknown";
               }
 
-              price.value = priceRequest;
+              //price.value = priceRequest;
           }
 
           // Send request
