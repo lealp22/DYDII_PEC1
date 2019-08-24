@@ -184,13 +184,13 @@
 
                     <div class="row">
                         <div class="col-2">
-                            <input type="text" id="codigo" required autofocus placeholder="Introduce código de barras" class="form-control" onblur="App.buscarCodigo()" />
+                            <input type="text" id="codigo" required autofocus placeholder="Introduce código de barras" class="form-control" onblur="App.processCode()" />
                         </div>
                         <div class="col-5">
                             <input type="text" id="description" class="form-control" disabled/>
                         </div>
                         <div class="col-2">
-                            <input type="number" id="cantidad" value="1" required="" min="1" max="100" placeholder="cantidad a entregar" class="form-control" />
+                            <input type="number" id="cantidad" value="1" required="" min="1" max="100" placeholder="cantidad a entregar" class="form-control" onchange="App.calculateAmount()" />
                         </div>
                         <div class="col-2">
                             <!--                            <input type="text" id="medida" placeholder="unidades o kilogramos" class="form-control" />-->
@@ -202,7 +202,7 @@
 
                         </div>
                         <div class="col-1">
-                            <input type="text" id="price" class="form-control center-align" disabled/>
+                            <input type="text" id="amount" class="form-control center-align" disabled/>
                         </div>
                     </div>
 

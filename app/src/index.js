@@ -7,7 +7,9 @@ const App = {
   meta: null,
   prodCode: null,
   prodFee: null,
-  prodQty: null,
+  prodQty: 0,
+  prodPrice: 0,
+  prodAmount: 0,
 
   start: async function() {
       const { web3 } = this;
@@ -34,6 +36,9 @@ const App = {
           // get accounts
           const accounts = await web3.eth.getAccounts();
           this.account = accounts[0];
+          this.prodCode = "";
+          this.prodFee = "";
+          this.prodQty = 0;
 
           // Log
           console.log("Account: ", this.account);
@@ -68,38 +73,53 @@ const App = {
   },
 
   sendCoin: async function() {
-      const amount = parseInt(document.getElementById("price").value);
+
+      //const amount = parseInt(document.getElementById("price").value);
       //const receiver = document.getElementById("receiver").value;
-      this.prodQty = parseInt(document.getElementById("cantidad").value);
-      this.prodUni = document.getElementById("medida").value;
+      //this.prodQty = parseInt(document.getElementById("cantidad").value);
 
-      // Log
-      console.log("** sendCoin **");
-      console.log("amount: ", amount);
-      //console.log("receiver: ", receiver);
-      console.log("codigo: ", this.prodCode);
-      console.log("fee: ",this.prodFee);
-      console.log("cantidad: ", this.prodQty);
-      console.log("unidad: ", this.prodUni);
-;
-      this.setStatus("Initiating transaction... (please wait)");
+      const code = document.getElementById("codigo");      
+      const measure = document.getElementById("medida");
 
-      const { sendCoin } = this.meta.methods;
-      await sendCoin(this.prodCode, this.prodFee, this.prodQty, this.prodUni).send({
-          from: this.account
-      });
+      if (code.checkValidity() && medida.checkValidity()) {
+        
+        this.prodUni = measure.value;
+        this.processCode();
+        this.calculateAmount();
       
-      this.setStatus("Transaction complete!");
-      this.refreshBalance();
+        // Log
+        console.log("** sendCoin **");
+        console.log("amount: ", this.prodAmount);
+        console.log("codigo: ", this.prodCode);
+        console.log("fee: ", this.prodFee);
+        console.log("cantidad: ", this.prodQty);
+        console.log("unidad: ", this.prodUni);
+
+        this.setStatus("Initiating transaction... (please wait)");
+
+        const { sendCoin } = this.meta.methods;
+        await sendCoin(this.prodCode, this.prodFee, this.prodQty, this.prodUni).send({
+          from: this.account
+        });
+      
+        this.setStatus("Transaction completed!");
+        this.refreshBalance();
+
+      } else {
+        this.setStatus("ERROR. Input values are not valid")
+      }
   },
 
-  buscarCodigo: async function() {
+  processCode: async function() {
+
       this.prodCode = document.getElementById("codigo").value;
       const description = document.getElementById("description");
       const prefix = 'https://api.mlab.com/api/1/databases/productos/collections/';
-      const apiKey = '1KuXCnUSqfOGDAoKSZHENTSFBBlu4d6n';
+      const apiKey1 = '"}&apiKey='
+      const apiKey2 = '1KuXCnUSqfOGDAoKSZHENTSFBBlu4d6n';
 
-      let priceRequest = 1;
+      this.prodPrice = 1;
+      this.prodFee = "";      
 
       console.log("Buscando codigo: ", this.prodCode);
 
@@ -109,7 +129,7 @@ const App = {
           
           // Create a request variable and assign a new XMLHttpRequest object to it.
           let request = new XMLHttpRequest();
-          let requestHttp = prefix.concat('products?q={"product":"',this.prodCode,'"}&apiKey=',apiKey);
+          let requestHttp = prefix.concat('products?q={"product":"',this.prodCode,apiKey1,apiKey2);
           
           // Log
           console.log("** XMLHttpRequest **");
@@ -136,9 +156,7 @@ const App = {
 
                     // Create a request variable and assign a new XMLHttpRequest object to it.
                     let request2 = new XMLHttpRequest();
-                    let requestHttp2 = prefix.concat('prices?q={"id_fee":"',this.prodFee,'"}&apiKey=',apiKey);
-                    //let requestHttp2 = 'https://api.mlab.com/api/1/databases/productos/collections/prices?q={"id_fee":"'||
-                    //                    this.prodFee || '"}&apiKey=' || apiKey;
+                    let requestHttp2 = prefix.concat('prices?q={"id_fee":"',this.prodFee,apiKey1,apiKey2);
 
                     // Log
                     console.log("** XMLHttpRequest2 **");
@@ -157,9 +175,10 @@ const App = {
                         console.log("Req// Log ", request2.status);
 
                         if (request2.status >= 200 && request2.status < 400 && data.length > 0) {
-                            priceRequest = data[0].precio;
+                            this.prodPrice = data[0].precio;
+                            //this.calculateAmount();
                         } else {
-                            console.log('ERROR: Tarifa no encontrada');
+                            console.log('ERROR: Fee code not found');
                         }
                    }  
 
@@ -171,42 +190,34 @@ const App = {
                    description.value = "unknown";
               }
 
-              //price.value = priceRequest;
+              //price.value = this.prodPrice;
           }
 
           // Send request
           request.send();
-          
-          /*
-          // Create a request variable and assign a new XMLHttpRequest object to it.
-          let request2 = new XMLHttpRequest()
 
-          // Open a new connection, using the GET request on the URL endpoint
-          request2.open('GET', 'https://api.mlab.com/api/1/databases/productos/collections/prices?q={ "id_fee": "0102","fecha_ini":{"$lt":"2019-07-20"},"fecha_fin":{"$gte":"2019-07-20"}}&apiKey=1KuXCnUSqfOGDAoKSZHENTSFBBlu4d6n', true)
+          this.calculateAmount();
+      } 
+  },
 
-          request2.onload = function() {
-              // Begin accessing JSON data here
-              // Begin accessing JSON data here
-              let data = JSON.parse(this.response);
-              
-              console.log("data: ", data);
-              console.log("Request.status: ", request2.status);
+  calculateAmount: function() {
 
-              if (request2.status >= 200 && request2.status < 400) {
-                  price.value = data[0].precio
-              } else {
-                  price.value = 1;                    
-                  console.log('error')
-              }
-          }
+      const quantity = document.getElementById("cantidad");
+      const amount = document.getElementById("amount");
 
-          // Send request
-          request2.send()            
-          */
-      } else {
-          this.setStatus("Error: En necesario indicar un código.");
-          price.value = 0;
-          description.value = "";
+      if (quantity.checkValidity()) {
+
+        this.prodQty = quantity.value;
+        this.prodAmount = this.prodPrice * this.prodQty;
+        amount.value = this.prodAmount;
+
+        // log
+        console.log("Cantidad: ",this.prodQty);
+        console.log("Price: ",this.prodPrice);
+        console.log("Amount: ",this.prodAmount);     
+
+      } else {     
+        this.setStatus("Quantity value is not valid");     
       }
   },
 
