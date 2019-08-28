@@ -49,7 +49,9 @@ module.exports = {
     // },
     
     develop: {
-      port: 9545
+      port: 9545,
+      gas: 7000000, // Gas limit used for deploys
+      gasPrice: 20000000000  // 20 gwei (in wei) (default: 100 gwei)
     },
 
     rinkeby: {
@@ -94,18 +96,25 @@ module.exports = {
     // timeout: 100000
   },
 
+  solc: {
+    optimizer: {
+      enabled: true,
+      runs: 200
+    }
+  },
+
   // Configure your compilers
   compilers: {
     solc: {
       version: "0.5.0",    // Fetch exact version from solc-bin (default: truffle's version)
       // docker: true,        // Use "0.5.1" you've installed locally with docker (default: false)
-      // settings: {          // See the solidity docs for advice about optimization and evmVersion
-      //  optimizer: {
-      //    enabled: false,
-      //    runs: 200
-      //  },
+      settings: {          // See the solidity docs for advice about optimization and evmVersion
+        optimizer: {
+          enabled: true,
+          runs: 200
+        }
       //  evmVersion: "byzantium"
-      // }
+      }
     }
   }
 }
