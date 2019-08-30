@@ -33463,14 +33463,142 @@
   },
   "networks": {
     "5777": {
-      "events": {},
+      "events": {
+        "0x2400353ee3cbddbecd51b36528703d6a9a1f15a73ef12fa52c45ebfbf5eb0e10": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "_sender",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "name": "_factory",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "_seq",
+              "type": "uint32"
+            }
+          ],
+          "name": "newUser",
+          "type": "event",
+          "signature": "0x2400353ee3cbddbecd51b36528703d6a9a1f15a73ef12fa52c45ebfbf5eb0e10"
+        },
+        "0x4abaca7060438a179d5f20d945b01077a6df8b016150a897abd09d3fdebcf109": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "_sender",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "_balance",
+              "type": "uint256"
+            }
+          ],
+          "name": "newBalance",
+          "type": "event",
+          "signature": "0x4abaca7060438a179d5f20d945b01077a6df8b016150a897abd09d3fdebcf109"
+        },
+        "0x836bef354ce6b0eb9296584e362560a94ed94ddbd47e6851b3c065fd12d16bc5": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "_sender",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "_amount",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "name": "_price",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "name": "_fee",
+              "type": "string"
+            }
+          ],
+          "name": "coinSent",
+          "type": "event",
+          "signature": "0x836bef354ce6b0eb9296584e362560a94ed94ddbd47e6851b3c065fd12d16bc5"
+        },
+        "0x71f1a5645e51a2da828ffcf79cc17da88eb25e1bca8b9dced23210847a4769c1": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "name": "_result",
+              "type": "string"
+            }
+          ],
+          "name": "LogPriceUpdated",
+          "type": "event",
+          "signature": "0x71f1a5645e51a2da828ffcf79cc17da88eb25e1bca8b9dced23210847a4769c1"
+        },
+        "0xc4dc360d0a9c0677a3379ae0a3d81e887f761e65fdf3d7e00859d1bcd3c47389": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "name": "description",
+              "type": "string"
+            }
+          ],
+          "name": "LogNewProvableQuery",
+          "type": "event",
+          "signature": "0xc4dc360d0a9c0677a3379ae0a3d81e887f761e65fdf3d7e00859d1bcd3c47389"
+        },
+        "0x6985a02210a168e66602d3235cb6db0e70f92b3ba4d376a33c0f3d9434bff625": {
+          "anonymous": false,
+          "inputs": [],
+          "name": "Pause",
+          "type": "event",
+          "signature": "0x6985a02210a168e66602d3235cb6db0e70f92b3ba4d376a33c0f3d9434bff625"
+        },
+        "0x7805862f689e2f13df9f062ff482ad3ad112aca9e0847911ed832e158c525b33": {
+          "anonymous": false,
+          "inputs": [],
+          "name": "Unpause",
+          "type": "event",
+          "signature": "0x7805862f689e2f13df9f062ff482ad3ad112aca9e0847911ed832e158c525b33"
+        },
+        "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "previousOwner",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "name": "newOwner",
+              "type": "address"
+            }
+          ],
+          "name": "OwnershipTransferred",
+          "type": "event",
+          "signature": "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0"
+        }
+      },
       "links": {},
-      "address": "0x99eB1A8BA237Cae6De904c391B29990eD74B4c0D",
-      "transactionHash": "0x7a0b7b3b4fcd6c27c85b325725d6bc6582d0cc488318ba6faccfc5f853bd3882"
+      "address": "0xFC37F919e03703Eb431cCc93496023ccb744D4a2",
+      "transactionHash": "0x1be8ad12f8f3c6ea4977166c727c659b5afefdf18d1787f25c19b99327d67fa7"
     }
   },
   "schemaVersion": "3.0.11",
-  "updatedAt": "2019-08-28T19:14:47.335Z",
+  "updatedAt": "2019-08-29T22:33:52.037Z",
   "devdoc": {
     "methods": {
       "pause()": {

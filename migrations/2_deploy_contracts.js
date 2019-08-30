@@ -1,8 +1,3 @@
-//const Ownable = artifacts.require("Ownable");
-//const Pausable = artifacts.require("Pausable");
-//const SafeMath = artifacts.require("SafeMath");
-//const UserFactory = artifacts.require("UserFactory");
-//const usingProvable = artifacts.require("usingProvable");
 const Recycler = artifacts.require("Recycler");
 
 module.exports = function(deployer) {

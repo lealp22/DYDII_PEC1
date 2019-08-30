@@ -86,6 +86,19 @@
     .w-45 {
         width: 45% !important;
     }
+
+    .w-100 {
+        width: 100% !important;
+    }
+
+    .btn-primary:disabled {
+        background-color: #A4A4A4;
+    }
+
+    .event-log {
+        height: 20rem;
+    }
+
 </style>
 
 <body>
@@ -127,8 +140,10 @@
             </div>
             <div class="card bg-faded border-1 mb-3">
                 <div class="card-body border-1">
-                    <h6 class="card-title">Conexión HTTP:</h6>
-                    <p class="card-text" id="conexion">unknow</p>
+                    <!--<h6 class="card-title">Conexión HTTP:</h6>
+                    <p class="card-text" id="conexion">unknow</p> -->
+                    <h6 class="card-title">Log:</h6>
+                    <textarea readonly class="w-100 event-log" id="eventsLog"></textarea>
                 </div>
             </div>
 
@@ -207,7 +222,7 @@
                     </div>
 
                     <div>
-                        <button onclick="App.sendCoin()" class="btn btn-primary btn-lg btn-block btn-mi m-auto">Enviar</button>
+                        <button id="sendButton" onclick="App.sendCoin()" class="btn btn-primary btn-lg btn-block btn-mi m-auto" disabled>Enviar</button>
                     </div>
 
                 </div>
@@ -274,6 +289,11 @@
                         </tbody>
                     </table>
 <!--                    <button onclick="App.sendCoin()" class="btn btn-primary btn-lg btn-block btn-mi m-auto">Enviar</button>-->
+                </div>
+                <div>
+                    <p class="center-align">
+                        Total movimientos: <b><span id="mvtsCount">unknown</span></b>
+                    </p>
                 </div>
 
             </div>
