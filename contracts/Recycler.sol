@@ -47,7 +47,6 @@ contract UserFactory {
         factory = msg.sender;
     }
 
-
     // Función para la creación de movimientos (con cada transacción realizada)
     // Solo se permitirá ejecutarlo al contrato padre (factory)
     // Se Validará:

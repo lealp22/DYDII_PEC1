@@ -32,6 +32,7 @@ const App = {
           console.log("networkId: ", networkId);
           console.log("deployedNetwork.address: ", deployedNetwork.address);
           console.log("deployedNetwork: ", deployedNetwork);
+          console.log("recyclerArtifact: ", recyclerArtifact);
 
           // get accounts
           const accounts = await web3.eth.getAccounts();
@@ -53,6 +54,27 @@ const App = {
           this.refreshBalance();
           this.lastMovements();
 
+          let eventCoinSent = this.meta.events.coinSent(function(error, result) {
+            console.log("coinSent");
+            if (!error)
+                console.log(result);
+                showMessage("Event coinSent");
+                App.lastMovements();
+          });
+          let eventNewUser = this.meta.events.newUser(function(error, result) {
+            console.log("newUser");
+            if (!error)
+                console.log(result);
+                showMessage("Event newUser");
+          });
+          let eventNewBalance = this.meta.events.newBalance(function(error, result) {
+            console.log("newBalance");
+            if (!error)
+                console.log(result);
+                showMessage("Event newBalance");
+                App.refreshBalance();
+          });
+
       } catch (error) {
           console.error("Could not connect to contract or chain.");
           // Log
@@ -65,16 +87,15 @@ const App = {
 
       //const amount = parseInt(document.getElementById("price").value);
       //const receiver = document.getElementById("receiver").value;
-      //this.prodQty = parseInt(document.getElementById("cantidad").value);
+      //this.prodQty = parseInt(document.getElementById("quantity").value);
 
-      const code = document.getElementById("codigo");      
-      const measure = document.getElementById("medida");
+      const codebar = document.getElementById("codebar");      
+      const measure = document.getElementById("measure");
 
-      if (code.checkValidity() && medida.checkValidity()) {
+      if (codebar.checkValidity() && measure.checkValidity()) {
         
         this.prodUni = measure.value;
-        await this.processCode();
-        //await this.calculateAmount(); --> Lo llama dentro de processCode
+        //await this.processCode();
       
         // Log
         console.log("******** sendCoin ********");
@@ -85,26 +106,47 @@ const App = {
         console.log("unidad: ", this.prodUni);
         console.log("cuenta:", this.account);
 
-        this.setStatus("Enviando transacción... (por favor, espere)");
+        this.setStatus("Enviando transacción...");
 
         const { sendCoin } = this.meta.methods;
         await sendCoin(this.prodCode, this.prodFee, this.prodQty, this.prodUni).send({
           from: this.account
         });
+
+        console.log("sendCoin: ", sendCoin);
       
         this.setStatus("Transacción completada");
         this.refreshBalance();
 
         document.getElementById("sendButton").disabled = true;
+        this.initializeInput();
 
       } else {
         this.setStatus("ERROR. Datos de entrada no válidos.")
       }
   },
 
+  initializeInput: async function() {
+
+    const codebar = document.getElementById("codebar");
+    const description = document.getElementById("description");   
+    const quantity = document.getElementById("quantity");
+    const measure = document.getElementById("measure");
+    const amount = document.getElementById("amount");
+
+    codebar.value = "";
+    description.value = "";
+    quantity.value = 1;
+    measure.value = "UNI";
+    amount.value = 1;
+    
+  },
+
   processCode: async function() {
 
-      this.prodCode = document.getElementById("codigo").value;
+      console.log("** Entrando a processCode **");
+
+      this.prodCode = document.getElementById("codebar").value;
       const description = document.getElementById("description");
       const prefix = 'https://api.mlab.com/api/1/databases/productos/collections/';
       const apiKey1 = '"}&apiKey='
@@ -192,6 +234,7 @@ const App = {
           // Send request
           request.send();
       } 
+      console.log("** Saliendo de processCode **");
   },
 
   refreshBalance: async function() {
@@ -228,54 +271,58 @@ const App = {
     if (numMvts > 0) {
         const { getMovement } = this.meta.methods;
 
-        let _ini = numMvts;
-        let _end = 1
+        let _ini = (numMvts > 5) ? numMvts - 4:1, _end = numMvts;
 
-        if (numMvts > 5) {
-            _end = numMvts - 4;
-        }
+        // Log
+        console.log("ini: ", _ini, " end: ", _end);
 
-        for (let i = _ini; i = _end; i--) {
-
-            let Mvt = await getMovement(this.account, i).call();
+        for (let i = _ini; i <= _end; i++) {
 
             // Log
-            console.log("Movimiento: ", Mvt);
+            console.log("Param. mvt: ", this.account, " i: ", i);
+            let mvt = await getMovement(this.account, i).call();
 
+            // Log
+            console.log("Movimiento: ", mvt);
+
+            this.addItem(mvt);
         }
     }
   },  
 
-  addItem: function() {
+  addItem: function(_mvt) {
 
-    this.setStatus("Añadiendo...");
+    this.setStatus("Añadiendo movimiento...");
 
-    const codigo = document.getElementById("codigo");
-    const cantidad = document.getElementById("cantidad");
-    const medida = document.getElementById("medida");
-    let tabla = document.getElementById("tabla-items");
+    let table = document.getElementById("table-items");
 
-    for (var i = tabla.rows.length - 2; i > 0; i--) {
-        tabla.rows[i + 1].cells[0].innerHTML = tabla.rows[i].cells[0].innerHTML;
-        tabla.rows[i + 1].cells[1].innerHTML = tabla.rows[i].cells[1].innerHTML;
-        tabla.rows[i + 1].cells[2].innerHTML = tabla.rows[i].cells[2].innerHTML;
+    // log
+    console.log("Largo tabla: ", table.rows.length)
+
+    for (let i = table.rows.length - 2; i > 0; i--) {
+        table.rows[i + 1].cells[0].innerHTML = table.rows[i].cells[0].innerHTML;
+        table.rows[i + 1].cells[1].innerHTML = table.rows[i].cells[1].innerHTML;
+        table.rows[i + 1].cells[2].innerHTML = table.rows[i].cells[2].innerHTML;
+        table.rows[i + 1].cells[3].innerHTML = table.rows[i].cells[3].innerHTML;
+        table.rows[i + 1].cells[4].innerHTML = table.rows[i].cells[4].innerHTML;                
     }
 
-    tabla.rows[1].cells[0].innerHTML = codigo.value;
-    tabla.rows[1].cells[1].innerHTML = cantidad.value;
-    tabla.rows[1].cells[2].innerHTML = medida.value;
+    // Log
+    console.log("Uni: ", _mvt[3]);
 
-    codigo.value = "";
-    cantidad.value = 0;
-    medida.value = "";
+    table.rows[1].cells[0].innerHTML = _mvt[0];
+    table.rows[1].cells[1].innerHTML = _mvt[1] + " unknown";
+    table.rows[1].cells[2].innerHTML = _mvt[2];
+    table.rows[1].cells[3].innerHTML = (_mvt[3] == "KGM") ? "Kilos":"Unidades";
+    table.rows[1].cells[4].innerHTML = _mvt[4];
 
-    this.setStatus("Nuevo elemento añadido");
+    this.setStatus("Movimiento añadido");
 
   },
 
   calculateAmount: function() {
 
-      const quantity = document.getElementById("cantidad");
+      const quantity = document.getElementById("quantity");
       const amount = document.getElementById("amount");
 
       if (quantity.checkValidity()) {
@@ -327,7 +374,7 @@ function showMessage(message) {
 
 /* function getCantidad() {
 
-    const quantity = document.getElementById("cantidad");
+    const quantity = document.getElementById("quantity");
     let _qty = 0;
 
     if (quantity.checkValidity()) {
@@ -337,7 +384,7 @@ function showMessage(message) {
 
 function calculateAmount(_price) {
 
-    const quantity = document.getElementById("cantidad");
+    const quantity = document.getElementById("quantity");
     const amount = document.getElementById("amount");
     let _qty = 0;
 
@@ -356,7 +403,7 @@ function calculateAmount(_price) {
         showMessage("Quantity value is not valid");     
     }
 
-    return {cantidad: _qty, amount: _amount};
+    return {quantity: _qty, amount: _amount};
 }; */ 
 
 window.App = App;

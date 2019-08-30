@@ -199,18 +199,18 @@
 
                     <div class="row">
                         <div class="col-2">
-                            <input type="text" id="codigo" required autofocus placeholder="Introduce código de barras" class="form-control" onblur="App.processCode()" />
+                            <input type="text" id="codebar" required autofocus placeholder="Introduce código de barras" class="form-control" onblur="App.processCode()" />
                         </div>
                         <div class="col-5">
                             <input type="text" id="description" class="form-control" disabled/>
                         </div>
                         <div class="col-2">
-                            <input type="number" id="cantidad" value="1" required="" min="1" max="100" placeholder="cantidad a entregar" class="form-control" onchange="App.calculateAmount()" />
+                            <input type="number" id="quantity" value="1" required="" min="1" max="100" placeholder="cantidad a entregar" class="form-control" onchange="App.calculateAmount()" />
                         </div>
                         <div class="col-2">
                             <!--                            <input type="text" id="medida" placeholder="unidades o kilogramos" class="form-control" />-->
 
-                            <select id="medida" required="" class="form-control">
+                            <select id="measure" required="" class="form-control">
                                 <option value="UNI" data-isdefault="true" selected="true">Unidades</option>
                                 <option value="KGM">Kilos</option>
                             </select>
@@ -239,7 +239,7 @@
 
                 <div class="table-responsive">
 
-                    <table class="table table-hover table-bordered">
+                    <table class="table table-hover table-bordered" id="table-items">
                         <thead>
                             <tr>
                                 <th class="w-20">Código</th>
@@ -251,39 +251,39 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td>800000000001</td>
-                                <td>More data</td>
-                                <td class="center-align">1</td>
-                                <td>Unidades</td>
-                                <td class="right-align">1</td>
+                                <td></td>
+                                <td></td>
+                                <td class="center-align"></td>
+                                <td></td>
+                                <td class="right-align"></td>
                             </tr>
                             <tr>
-                                <td>800000000002</td>
-                                <td>More data</td>
-                                <td class="center-align">2</td>
-                                <td>Unidades</td>
-                                <td class="right-align">1</td>                                
+                                <td></td>
+                                <td></td>
+                                <td class="center-align"></td>
+                                <td></td>
+                                <td class="right-align"></td>
                             </tr>
                             <tr>
-                                <td>800000000003</td>
-                                <td>More data</td>
-                                <td class="center-align">1</td>
-                                <td>Kilos</td>
-                                <td class="right-align">10</td>                                
+                                <td></td>
+                                <td></td>
+                                <td class="center-align"></td>
+                                <td></td>
+                                <td class="right-align"></td>
                             </tr>
                             <tr>
-                                <td>800000000004</td>
-                                <td>More data</td>
-                                <td class="center-align">4</td>
-                                <td>Unidades</td>
-                                <td class="right-align">1</td>                                
+                                <td></td>
+                                <td></td>
+                                <td class="center-align"></td>
+                                <td></td>
+                                <td class="right-align"></td>
                             </tr>
                             <tr>
-                                <td>800000000005</td>
-                                <td>More data</td>
-                                <td class="center-align">12</td>
-                                <td>Unidades</td>
-                                <td class="right-align">2</td>                                
+                                <td></td>
+                                <td></td>
+                                <td class="center-align"></td>
+                                <td></td>
+                                <td class="right-align"></td>
                             </tr>
 
                         </tbody>
