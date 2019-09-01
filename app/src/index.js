@@ -53,27 +53,7 @@ const App = {
 
           this.refreshBalance();
           this.lastMovements();
-
-          let eventCoinSent = this.meta.events.coinSent(function(error, result) {
-            console.log("coinSent");
-            if (!error)
-                console.log(result);
-                showMessage("Event coinSent");
-                App.lastMovements();
-          });
-          let eventNewUser = this.meta.events.newUser(function(error, result) {
-            console.log("newUser");
-            if (!error)
-                console.log(result);
-                showMessage("Event newUser");
-          });
-          let eventNewBalance = this.meta.events.newBalance(function(error, result) {
-            console.log("newBalance");
-            if (!error)
-                console.log(result);
-                showMessage("Event newBalance");
-                App.refreshBalance();
-          });
+          this.setEvents();
 
       } catch (error) {
           console.error("Could not connect to contract or chain.");
@@ -81,6 +61,65 @@ const App = {
           console.log("error: ", error);
           this.setStatus("Could not connect to contract or chain.");
       }
+  },
+
+  //*
+  //* setEvents: Define el comportamiento de la aplicación antes los eventos que reciba del SC
+  //*
+  setEvents:function() {
+
+    this.meta.once("coinSent", function(error, event){ 
+        console.log("--Meta.Once.CointSent--"); 
+        console.log("Error coinSent: ", error);
+        console.log("Event coinSent: ", event);
+        if (!error)
+            alert("Transacciones realizada correctamente\n" + "Su hash:\n" + event.transactionHash);
+            showMessage("Evento coinSent recibido");
+            App.lastMovements();        
+    });
+
+    this.meta.once("newUser", function(error, event){ 
+        console.log("--Meta.Once.Newuser--"); 
+        console.log("Error newUser: ", error);
+        console.log("Event newUser: ", event);
+        if (!error)
+            showMessage("Evento newUser recibido");
+    });    
+
+    this.meta.once("newBalance", function(error, event){ 
+        console.log("--Meta.Once.newBalance--"); 
+        console.log("Error newBalancenSent: ", error);
+        console.log("Event newBalance: ", event);
+        if (!error)
+            showMessage("Evento newBalance recibido");
+            App.refreshBalance();
+    });
+/*     
+    console.log("====Resto Eventos=====");
+
+    let eventCoinSent = this.meta.events.coinSent(function(error, result) {
+        console.log("--coinSent--");
+        if (!error)
+            console.log(result);
+            showMessage("Event coinSent");
+            App.lastMovements();
+    });
+
+    let eventNewUser = this.meta.events.newUser(function(error, result) {
+        console.log("--newUser--");
+        if (!error)
+            console.log(result);
+            showMessage("Event newUser");
+    });
+
+    let eventNewBalance = this.meta.events.newBalance(function(error, result) {
+        console.log("--newBalance--");
+        if (!error)
+            console.log(result);
+            showMessage("Event newBalance");
+            App.refreshBalance();
+    });
+ */
   },
 
   sendCoin: async function() {
@@ -111,12 +150,19 @@ const App = {
         const { sendCoin } = this.meta.methods;
         await sendCoin(this.prodCode, this.prodFee, this.prodQty, this.prodUni).send({
           from: this.account
+        }, function(error, transactionHash){
+            if (error) {
+                console.log("error sendCoin: ", error);
+                showMessage("Error. Transacción no completada");
+                alert(error);
+            } else {
+                console.log("transactionHash sendCoin: ", transactionHash);
+                showMessage("Transacción completada");
+            }
         });
 
-        console.log("sendCoin: ", sendCoin);
-      
-        this.setStatus("Transacción completada");
-        this.refreshBalance();
+        //this.setStatus("Transacción completada");
+        //this.refreshBalance();
 
         document.getElementById("sendButton").disabled = true;
         this.initializeInput();
@@ -292,7 +338,7 @@ const App = {
 
   addItem: function(_mvt) {
 
-    this.setStatus("Añadiendo movimiento...");
+    //this.setStatus("Añadiendo movimiento...");
 
     let table = document.getElementById("table-items");
 

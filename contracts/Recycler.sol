@@ -160,7 +160,7 @@ contract Recycler is usingProvable, Pausable {
 
     //* Evento finalización envío de tokens
     event coinSent(
-        address indexed _sender, uint _amount, uint _price, string _fee
+        address indexed _sender, string _code, string _fee, uint  _qty, string  _uni, uint _amount, uint _price
     );
 
     //event LogConstructorInitiated(string nextStep);
@@ -223,7 +223,7 @@ contract Recycler is usingProvable, Pausable {
         users[_sender].userContr.addMovement(_trans.code, _trans.fee, _trans.qty, _trans.uni, _amount);
         addBalance(_sender, _amount);
 
-        emit coinSent(_sender, _amount, _price, _trans.fee);
+        emit coinSent(_sender, _trans.code, _trans.fee, _trans.qty, _trans.uni, _amount, _price);
     }
 
     //*
