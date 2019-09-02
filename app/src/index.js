@@ -10,6 +10,9 @@ const App = {
   prodQty: 0,
   prodPrice: 0,
   prodAmount: 0,
+  eventSet1: null,
+  eventSet2: null,
+  eventSet3: null,
 
   start: async function() {
       const { web3 } = this;
@@ -40,6 +43,9 @@ const App = {
           this.prodCode = "";
           this.prodFee = "";
           this.prodQty = 0;
+          this.eventSet1 = new Set();
+          this.eventSet2 = new Set();
+          this.eventSet3 = new Set();
 
           // Log
           console.log("Account: ", this.account);
@@ -67,44 +73,135 @@ const App = {
   //* setEvents: Define el comportamiento de la aplicación antes los eventos que reciba del SC
   //*
   setEvents:function() {
-
+    /*
     this.meta.once("coinSent", function(error, event){ 
         console.log("--Meta.Once.CointSent--"); 
         console.log("Error coinSent: ", error);
         console.log("Event coinSent: ", event);
-        if (!error)
-            alert("Transacciones realizada correctamente\n" + "Su hash:\n" + event.transactionHash);
-            showMessage("Evento coinSent recibido");
-            App.lastMovements();        
-    });
 
+        let _amount = event.returnValues._amount;
+        let _sToken = (_amount == 1) ? " token ":" tokens ";
+        let _mvt = [event.returnValues._code, event.returnValues._fee, event.returnValues._qty, event.returnValues._uni, _amount];
+
+        console.log("Alerta: ", _amount, " ", _sToken);
+
+        if (!error) {
+            showMessage("Evento coinSent recibido");
+            App.addItem(_mvt);  
+            App.movementCount();
+            alert("Se han ingresado " + String(_amount) + _sToken + "en su cuenta.\n\n"+ "Tx hash:\n" + event.transactionHash);
+        }      
+    });
+    
     this.meta.once("newUser", function(error, event){ 
         console.log("--Meta.Once.Newuser--"); 
         console.log("Error newUser: ", error);
         console.log("Event newUser: ", event);
-        if (!error)
+
+        if (!error) {
             showMessage("Evento newUser recibido");
+            alert("Nuevo usuario creado.\n\n"+"Bienvenido y gracias por reciclar!");
+        }
+            
     });    
 
     this.meta.once("newBalance", function(error, event){ 
         console.log("--Meta.Once.newBalance--"); 
         console.log("Error newBalancenSent: ", error);
         console.log("Event newBalance: ", event);
-        if (!error)
+        if (!error) {
             showMessage("Evento newBalance recibido");
             App.refreshBalance();
+        }
     });
-/*     
+     
     console.log("====Resto Eventos=====");
+    */
+    //* 
+    //* Tratamiento evento coinSent
+    //*
+    let eventCoinSent = this.meta.events.coinSent({ filter: {_sender: this.address}}, function(error, event){ 
 
-    let eventCoinSent = this.meta.events.coinSent(function(error, result) {
-        console.log("--coinSent--");
-        if (!error)
-            console.log(result);
-            showMessage("Event coinSent");
-            App.lastMovements();
+        console.log("Error coinSent: ", error);
+        console.log("Event coinSent: ", event);
+
+        if (!error) {
+
+            console.log("CoinSent hash: ", event.transactionHash);
+            console.log("CoinSent eventSet1: ", App.eventSet1);
+
+            if (!App.eventSet1.has(event.transactionHash)) {
+
+                App.eventSet1.add(event.transactionHash);
+
+                let _amount = event.returnValues._amount;
+                let _sToken = (_amount == 1) ? " token ":" tokens ";
+                let _mvt = [event.returnValues._code, event.returnValues._fee, event.returnValues._qty, 
+                            event.returnValues._uni, _amount];
+
+                console.log("Alerta: ", _amount, " ", _sToken);
+
+                showMessage("Evento coinSent recibido");
+                App.addItem(_mvt);  
+                App.movementCount();
+                alert("Se han ingresado " + String(_amount) + _sToken + "en su cuenta.\n\n"+ "Tx hash:\n" + event.transactionHash);
+            }
+        }      
     });
 
+    //* 
+    //* Tratamiento evento newBalance
+    //*
+    let eventNewBalance = this.meta.events.newBalance({ filter: {_sender: this.address}}, function(error, event){ 
+
+        console.log("Error newBalance: ", error);
+        console.log("Event newBalance: ", event);
+
+        if (!error) {
+
+            console.log("newBalance hash: ", event.transactionHash);
+            console.log("newBalance eventSet2: ", App.eventSet2);
+
+            if (!App.eventSet2.has(event.transactionHash)) {
+
+                App.eventSet2.add(event.transactionHash);
+                App.refreshBalance();
+                showMessage("Evento newBalance recibido"); 
+            }
+        }      
+    });   
+    
+    //* 
+    //* Tratamiento evento newUser
+    //*
+    let eventNewUser = this.meta.events.newUser({ filter: {_sender: this.address}}, function(error, event){ 
+
+        console.log("Error newUser: ", error);
+        console.log("Event newUser: ", event);
+
+        if (!error) {
+
+            console.log("newUser hash: ", event.transactionHash);
+            console.log("newUser eventSet3: ", App.eventSet3);
+
+            if (!App.eventSet3.has(event.transactionHash)) {
+
+                App.eventSet3.add(event.transactionHash);
+                showMessage("Evento newUser recibido");
+                alert("Nuevo usuario creado.\n\n"+"Bienvenido y gracias por reciclar!");
+            }
+        }      
+    });    
+    /*
+    .on('data', function(event){
+        console.log("coinSent data"); // same results as the optional callback above
+    })
+    .on('changed', function(event){
+        console.log("coinSent changed");
+        // remove event from local database
+    })
+    .on('error', console.error);
+    
     let eventNewUser = this.meta.events.newUser(function(error, result) {
         console.log("--newUser--");
         if (!error)
@@ -131,7 +228,7 @@ const App = {
       const codebar = document.getElementById("codebar");      
       const measure = document.getElementById("measure");
 
-      if (codebar.checkValidity() && measure.checkValidity()) {
+      if (codebar.checkValidity() && quantity.checkValidity() && measure.checkValidity()) {
         
         this.prodUni = measure.value;
         //await this.processCode();
@@ -163,16 +260,18 @@ const App = {
 
         //this.setStatus("Transacción completada");
         //this.refreshBalance();
-
-        document.getElementById("sendButton").disabled = true;
         this.initializeInput();
 
       } else {
-        this.setStatus("ERROR. Datos de entrada no válidos.")
+        this.setStatus("ERROR. Datos de entrada no válidos.");
+        alert("ERROR. Datos de entrada no válidos.");
       }
+      document.getElementById("sendButton").disabled = true;
   },
 
   initializeInput: async function() {
+
+    console.log("entrando initializeInput");
 
     const codebar = document.getElementById("codebar");
     const description = document.getElementById("description");   
@@ -283,10 +382,14 @@ const App = {
       console.log("** Saliendo de processCode **");
   },
 
+  //* 
+  //*   Actualiza el saldo de la cuenta y el saldo total de tokens en circulación
+  //*
   refreshBalance: async function() {
 
     console.log("** refreshBalance init **");
 
+    // Saldo de la cuenta
     const { getBalance } = this.meta.methods;
     const balance = await getBalance(this.account).call();
 
@@ -297,22 +400,46 @@ const App = {
 
     const balanceElement = document.getElementById("saldo");
     balanceElement.innerHTML = balance;
+
+    // Saldo total de tokens entregados por el SC a todas las direcciones
+    const { getGlobalBalance } = this.meta.methods;
+    const globalBalance = await getGlobalBalance().call();
+
+    const globalBalanceElement = document.getElementById("globalBalance");
+    globalBalanceElement.innerHTML = globalBalance;
+
   },
 
+  //*
+  //* Obtiene del SC el número de movimientos que tiene la cuenta actual
+  //*
+  movementCount: async function() {
+
+    const { getMovementCount } = this.meta.methods;
+    const _numMvts = await getMovementCount(this.account).call();
+
+    // Log
+    console.log("** movementCount **");
+    console.log("this.account: ", this.account);
+    console.log("movimientos: ", _numMvts);
+
+    const mvtsCount = document.getElementById("mvtsCount");
+    mvtsCount.innerHTML = _numMvts;    
+
+    return _numMvts;
+  },
+
+  //*
+  //*  Obtiene del SC los últimos 5 movimientos de la cuenta actual y los incluye
+  //*  en la tabla de movimientos 
+  //*
   lastMovements: async function() {
 
     console.log("** lastMovements init **");
 
-    const { getMovementCount } = this.meta.methods;
-    const numMvts = await getMovementCount(this.account).call();
+    let numMvts = await this.movementCount();
 
-    // Log
-    console.log("** lastMovements **");
-    console.log("this.account: ", this.account);
-    console.log("movimientos: ", numMvts);
-
-    const mvtsCount = document.getElementById("mvtsCount");
-    mvtsCount.innerHTML = numMvts;
+    console.log("numMvts devuelto: ", numMvts);
 
     if (numMvts > 0) {
         const { getMovement } = this.meta.methods;
@@ -336,9 +463,11 @@ const App = {
     }
   },  
 
+  //*
+  //* Incluye un item (movimiento) al principio de la tabla de movimientos
+  //* desplazando los existentes
+  //*
   addItem: function(_mvt) {
-
-    //this.setStatus("Añadiendo movimiento...");
 
     let table = document.getElementById("table-items");
 
@@ -385,7 +514,7 @@ const App = {
         document.getElementById("sendButton").disabled = false;
 
       } else {     
-        this.setStatus("Quantity value is not valid");     
+        this.setStatus("La cantidad no es válida. Mínimo 1, máximo 1000");     
       }
   },
 
@@ -407,50 +536,16 @@ function isEmpty(valor) {
   }
 };
 
-function showMessage(message) {
+function showMessage(_message) {
 
     console.log("Entrando showMessage function");
     const status = document.getElementById("status");
     const eventsLog = document.getElementById("eventsLog");
-    status.innerHTML = message;
-    eventsLog.textContent = message + "\n" + eventsLog.textContent;
+    status.innerHTML = _message;
+    eventsLog.textContent = _message + "\n" + eventsLog.textContent;
     console.log("Saliendo showMessage function");
 
 };
-
-/* function getCantidad() {
-
-    const quantity = document.getElementById("quantity");
-    let _qty = 0;
-
-    if (quantity.checkValidity()) {
-
-    return _qty;
-}
-
-function calculateAmount(_price) {
-
-    const quantity = document.getElementById("quantity");
-    const amount = document.getElementById("amount");
-    let _qty = 0;
-
-    if (quantity.checkValidity()) {
-
-      this.prodQty = quantity.value;
-      this.prodAmount = _price * this.prodQty;
-      amount.value = this.prodAmount;
-
-      // log
-      console.log("Cantidad: ",this.prodQty);
-      console.log("Price: ", _price);
-      console.log("Amount: ",this.prodAmount);     
-
-    } else {     
-        showMessage("Quantity value is not valid");     
-    }
-
-    return {quantity: _qty, amount: _amount};
-}; */ 
 
 window.App = App;
 

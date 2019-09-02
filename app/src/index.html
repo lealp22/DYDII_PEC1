@@ -7,7 +7,6 @@
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
-    <!--    <link rel="stylesheet" href="css/bootstrap4-vibrant-sea.min.css">-->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Oswald:300,400|Roboto:400,700">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
@@ -55,10 +54,6 @@
     .right-align {
         text-align: right;
     }
-    /*    .padding-mi {
-        padding-right: 0.5rem;
-        padding-left: 0.5rem;
-    }*/
     
     .padding-mi {
         padding-top: 2rem;
@@ -140,10 +135,13 @@
             </div>
             <div class="card bg-faded border-1 mb-3">
                 <div class="card-body border-1">
-                    <!--<h6 class="card-title">Conexión HTTP:</h6>
-                    <p class="card-text" id="conexion">unknow</p> -->
                     <h6 class="card-title">Log:</h6>
                     <textarea readonly class="w-100 event-log" id="eventsLog"></textarea>
+                </div>
+                <div>
+                    <p class="center-align">
+                        Tokens en circulación: <b><span id="globalBalance">unknown</span></b>
+                    </p>
                 </div>
             </div>
 
@@ -170,14 +168,6 @@
                 </div>
 
                 <div>
-                    <!--                    <label for="codigo">Código:</label>
-                    <input type="text" id="codigo" placeholder="Introduce código de barras" class="form-control" />
-
-                    <label for="cantidad">Cantidad:</label>
-                    <input type="text" id="cantidad" placeholder="cantidad a entregar" class="form-control" />
-
-                    <label for="medida">Medida:</label>
-                    <input type="text" id="medida" placeholder="unidades o kilogramos" class="form-control" />-->
 
                     <div class="row">
                         <div class="col-2">
@@ -208,13 +198,10 @@
                             <input type="number" id="quantity" value="1" required="" min="1" max="100" placeholder="cantidad a entregar" class="form-control" onchange="App.calculateAmount()" />
                         </div>
                         <div class="col-2">
-                            <!--                            <input type="text" id="medida" placeholder="unidades o kilogramos" class="form-control" />-->
-
                             <select id="measure" required="" class="form-control">
                                 <option value="UNI" data-isdefault="true" selected="true">Unidades</option>
                                 <option value="KGM">Kilos</option>
                             </select>
-
                         </div>
                         <div class="col-1">
                             <input type="text" id="amount" class="form-control center-align" disabled/>
@@ -288,7 +275,7 @@
 
                         </tbody>
                     </table>
-<!--                    <button onclick="App.sendCoin()" class="btn btn-primary btn-lg btn-block btn-mi m-auto">Enviar</button>-->
+
                 </div>
                 <div>
                     <p class="center-align">
@@ -298,10 +285,7 @@
 
             </div>
 
-
-
             <script src="index.js"></script>
-            <!--            <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>-->
 
 </body>
 
