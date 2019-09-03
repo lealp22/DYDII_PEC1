@@ -1,4 +1,6 @@
-Actualizar al cambiar de contrato
+Revisar por qué ahora no actualiza el log
+Implementar botón Pause
+
 Ver puntos de seguridad
 Testing
 Desplegar en una Testnet
@@ -10,3 +12,5 @@ Opciones para el cambio de tokens --> Explicar en patrones no implementados
 
 0xF95F43065b80d244E87f64CC37a5dEf1964aF639
 76fd5c95d5cde983d8161245c94498af2cfe4d527a34dbddbf8255b14872bef8
+
+truffle deploy --reset

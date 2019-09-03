@@ -35,7 +35,7 @@ const App = {
           console.log("networkId: ", networkId);
           console.log("deployedNetwork.address: ", deployedNetwork.address);
           console.log("deployedNetwork: ", deployedNetwork);
-          console.log("recyclerArtifact: ", recyclerArtifact);
+          //console.log("recyclerArtifact: ", recyclerArtifact);
 
           // get accounts
           const accounts = await web3.eth.getAccounts();
@@ -51,15 +51,27 @@ const App = {
           console.log("Account: ", this.account);
           console.log("Accounts: ", accounts);
 
-          const accountIdElement = document.getElementById("cuenta");
-          accountIdElement.innerHTML = this.account;
+          //var account;
+
+          web3.currentProvider.publicConfigStore.on("update", async function(event){
+            
+            console.log("Metamask update new account: ", event.selectedAddress);
+            console.log("Metamask update event: ", event);
+            console.log("Metamask cuenta actual: ", App.account);
+
+            if (event.selectedAddress.toLowerCase() != App.account.toLowerCase()) {
+
+                App.account = event.selectedAddress;
+                App.initializeTable();
+                App.loadAccount();
+            }
+
+          });
 
           const networkIdElement = document.getElementById("red");
           networkIdElement.innerHTML = networkId;
 
-          this.refreshBalance();
-          this.lastMovements();
-          this.setEvents();
+          this.loadAccount();
 
       } catch (error) {
           console.error("Could not connect to contract or chain.");
@@ -70,9 +82,26 @@ const App = {
   },
 
   //*
+  //* loadAccount: Carga en el front los datos de la cuenta
+  //*
+  loadAccount: async function() {
+
+    this.setStatus("Se cargan datos cuenta");
+    console.log("loadAccount: ", this.account);
+
+    const accountIdElement = document.getElementById("cuenta");
+    accountIdElement.innerHTML = this.account;
+
+    this.refreshBalance();
+    this.lastMovements();
+    this.setEvents();
+
+  },
+
+  //*
   //* setEvents: Define el comportamiento de la aplicación antes los eventos que reciba del SC
   //*
-  setEvents:function() {
+  setEvents: function() {
     /*
     this.meta.once("coinSent", function(error, event){ 
         console.log("--Meta.Once.CointSent--"); 
@@ -287,6 +316,25 @@ const App = {
     
   },
 
+  //*
+  //* initializeTable: Inicializa la tabla html utilizada para mostrar los movimientos
+  //*
+  initializeTable: function() {
+
+    let table = document.getElementById("table-items");
+
+    console.log("Table: ", table);
+    console.log("Largo table: ", table.rows.length);
+
+    for (let i = 1; i < table.rows.length; i++) {
+        for (let j = 0; j < 5; j++) {
+            console.log("Celda: ", i, "/", j);
+            table.rows[i].cells[j].innerHTML = "";
+        }
+    }
+
+  },
+
   processCode: async function() {
 
       console.log("** Entrando a processCode **");
@@ -491,7 +539,7 @@ const App = {
     table.rows[1].cells[3].innerHTML = (_mvt[3] == "KGM") ? "Kilos":"Unidades";
     table.rows[1].cells[4].innerHTML = _mvt[4];
 
-    this.setStatus("Movimiento añadido");
+    this.setStatus("Se muestra movimiento");
 
   },
 
