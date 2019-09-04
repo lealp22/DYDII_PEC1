@@ -13,6 +13,8 @@ const App = {
   eventSet1: null,
   eventSet2: null,
   eventSet3: null,
+  owner: null,
+  paused: false,
 
   start: async function() {
       const { web3 } = this;
@@ -37,40 +39,45 @@ const App = {
           console.log("deployedNetwork: ", deployedNetwork);
           //console.log("recyclerArtifact: ", recyclerArtifact);
 
-          // get accounts
+          // Obtiene la cuenta con que se va a trabajar
           const accounts = await web3.eth.getAccounts();
           this.account = accounts[0];
+
+          // Inicializa variables de trabajo
           this.prodCode = "";
           this.prodFee = "";
           this.prodQty = 0;
           this.eventSet1 = new Set();
           this.eventSet2 = new Set();
           this.eventSet3 = new Set();
+          this.owner = this.getOwner();
+          this.paused = this.getPaused();
 
           // Log
           console.log("Account: ", this.account);
           console.log("Accounts: ", accounts);
 
-          //var account;
-
+          // Escuchamos los cambios en Metamask para poder detectar un cambio de cuenta
           web3.currentProvider.publicConfigStore.on("update", async function(event){
             
             console.log("Metamask update new account: ", event.selectedAddress);
             console.log("Metamask update event: ", event);
-            console.log("Metamask cuenta actual: ", App.account);
+            console.log("Metamask cuenta actual: ", this.account);
 
-            if (event.selectedAddress.toLowerCase() != App.account.toLowerCase()) {
+            // Se valida si la cuenta seleccionada en Metamask ha cambiado
+            if (event.selectedAddress.toLowerCase() != this.account.toLowerCase()) {
 
-                App.account = event.selectedAddress;
-                App.initializeTable();
-                App.loadAccount();
+                this.account = event.selectedAddress;
+                this.initializeTableItems();
+                this.loadAccount();
             }
 
-          });
+          }.bind(this));
 
           const networkIdElement = document.getElementById("red");
           networkIdElement.innerHTML = networkId;
 
+          this.getUserCount();
           this.loadAccount();
 
       } catch (error) {
@@ -95,6 +102,7 @@ const App = {
     this.refreshBalance();
     this.lastMovements();
     this.setEvents();
+    this.prepareOwner();
 
   },
 
@@ -145,7 +153,20 @@ const App = {
     });
      
     console.log("====Resto Eventos=====");
+
+
+    var event = clientReceipt.Deposit();
+
+    // mirar si hay cambios
+    event.watch(function(error, result){
+       // el resultado contendrá varias informaciones incluyendo los argumentos proporcionados en el momento de la llamada a Deposit.
+       if (!error)
+           console.log(result);
+    });
     */
+    
+
+
     //* 
     //* Tratamiento evento coinSent
     //*
@@ -221,33 +242,64 @@ const App = {
             }
         }      
     });    
-    /*
-    .on('data', function(event){
-        console.log("coinSent data"); // same results as the optional callback above
-    })
-    .on('changed', function(event){
-        console.log("coinSent changed");
-        // remove event from local database
-    })
-    .on('error', console.error);
-    
-    let eventNewUser = this.meta.events.newUser(function(error, result) {
-        console.log("--newUser--");
-        if (!error)
-            console.log(result);
-            showMessage("Event newUser");
-    });
 
-    let eventNewBalance = this.meta.events.newBalance(function(error, result) {
-        console.log("--newBalance--");
-        if (!error)
-            console.log(result);
-            showMessage("Event newBalance");
-            App.refreshBalance();
-    });
- */
+    //* 
+    //* Tratamiento evento Pause
+    //*
+    let eventPause = this.meta.events.Pause({ filter: {_sender: this.address}}, function(error, event){ 
+
+        console.log("Evento Pause: ", event);
+        console.log("Error Pause: ", error);
+
+        if (!error) {
+
+            console.log("CoinSent hash: ", event.transactionHash);
+            console.log("CoinSent eventSet1: ", this.eventSet1);
+    
+            if (!this.eventSet1.has(event.transactionHash)) {
+    
+                this.eventSet1.add(event.transactionHash);
+
+                alert("EL contrato ha sido pausado correctamente\n"+ "Tx hash:\n" + event.transactionHash);
+                this.paused = this.getPaused();
+            }
+        }
+
+    }.bind(this));
+
+    //* 
+    //* Tratamiento evento Unpause
+    //*
+    let eventUnpause = this.meta.events.Unpause({ filter: {_sender: this.address}}, function(error, event){ 
+
+        console.log("Evento Unpause: ", event);
+        console.log("Error Unpause: ", error);
+
+        if (!error) {
+
+            console.log("CoinSent hash: ", event.transactionHash);
+            console.log("CoinSent eventSet1: ", this.eventSet1);
+    
+            if (!this.eventSet1.has(event.transactionHash)) {
+    
+                this.eventSet1.add(event.transactionHash);
+
+                alert("EL contrato ha sido despausado correctamente\n"+ "Tx hash:\n" + event.transactionHash);
+                this.paused = this.getPaused();
+            }
+        }
+
+    }.bind(this));
+
   },
 
+  //*
+  //*   sendCoin: Transacción para sumar tokens al saldo del usuario a cambio del envase entregado.
+  //*             Si la api encontró el código del envase, se enviará el código de tarifa (fee) para
+  //*             que, con el oráculo, se determine en firme el número de tokens que se entregará
+  //*             al usuario. Si no, la fee se enviará vacía y se entregará por defecto un token por 
+  //*             cada unidad.
+  //*             
   sendCoin: async function() {
 
       //const amount = parseInt(document.getElementById("price").value);
@@ -257,6 +309,7 @@ const App = {
       const codebar = document.getElementById("codebar");      
       const measure = document.getElementById("measure");
 
+      // Se verifica que los valores de los campos de input son válidos 
       if (codebar.checkValidity() && quantity.checkValidity() && measure.checkValidity()) {
         
         this.prodUni = measure.value;
@@ -298,6 +351,9 @@ const App = {
       document.getElementById("sendButton").disabled = true;
   },
 
+  //*
+  //*   initializeInput: Inicializa los campos input
+  //*
   initializeInput: async function() {
 
     console.log("entrando initializeInput");
@@ -317,9 +373,9 @@ const App = {
   },
 
   //*
-  //* initializeTable: Inicializa la tabla html utilizada para mostrar los movimientos
+  //* initializeTableItems: Inicializa la tabla html utilizada para mostrar los movimientos
   //*
-  initializeTable: function() {
+  initializeTableItems: function() {
 
     let table = document.getElementById("table-items");
 
@@ -335,6 +391,11 @@ const App = {
 
   },
 
+  //*
+  //*   processCode: Verifica mediante la api si el código de barra introducido está registrado
+  //*                y, si es así, intenta obtener el número de tokens (fee) que se deben entregar 
+  //*                por cada unidad entregada
+  //*
   processCode: async function() {
 
       console.log("** Entrando a processCode **");
@@ -449,7 +510,14 @@ const App = {
     const balanceElement = document.getElementById("saldo");
     balanceElement.innerHTML = balance;
 
-    // Saldo total de tokens entregados por el SC a todas las direcciones
+    this.globalBalance();
+  },
+
+  //*
+  //*   globalBalance: Recupera el Saldo total de tokens entregados por el SC a todas las direcciones
+  //*
+  globalBalance: async function() {
+
     const { getGlobalBalance } = this.meta.methods;
     const globalBalance = await getGlobalBalance().call();
 
@@ -457,6 +525,127 @@ const App = {
     globalBalanceElement.innerHTML = globalBalance;
 
   },
+
+  //*
+  //*   getOwner: Recupera la dirección del owner
+  //*
+  getOwner: async function() {
+
+    this.setStatus("Se recupera owner del contrato");
+
+    const { owner } = this.meta.methods;
+    const _owner = await owner().call();
+
+    console.log("Owner: ", _owner);    
+
+    const ownerElement = document.getElementById("owner");
+    ownerElement.innerHTML = _owner;
+
+    return _owner;
+  },
+
+  //*
+  //*   getPaused: Verifica si se ha detenido el contrato (paused - circuit break)
+  //*
+  getPaused: async function() {
+
+    this.setStatus("Se recupera estado (paused) del contrato");    
+
+    const { paused } = this.meta.methods;
+    const _paused = await paused().call();
+
+    console.log("Paused: ", _paused);
+
+    const pausedElement = document.getElementById("paused");
+    pausedElement.innerHTML = (_paused) ? "Si":"No";
+
+    if (_paused) {
+        const pauseButton = document.getElementById("pauseButton");
+        pauseButton.innerHTML = "Unpause";
+    }
+
+    return _paused;
+  },  
+
+  //*
+  //*   pause: Verifica el estado del contrato (paused/unpaused) para cambiar al estado contrario
+  //*
+  pause: async function() {
+
+    console.log("--entrando pause--");
+
+    this.paused = await this.getPaused();
+
+    if (this.paused) {
+
+        const { unpause } = this.meta.methods;
+        await unpause().send({
+            from: this.account
+        }, function(error, transactionHash){
+            if (error) {
+                console.log("error unpause: ", error);
+                showMessage("Error. Transacción no completada");
+                alert(error);
+            } else {
+                console.log("transactionHash unpause: ", transactionHash);
+                showMessage("Transacción completada");
+            }
+        });
+
+    } else {
+
+        const { pause } = this.meta.methods;
+        await pause().send({
+            from: this.account
+        }, function(error, transactionHash){
+            if (error) {
+                console.log("error pause: ", error);
+                showMessage("Error. Transacción no completada");
+                alert(error);
+            } else {
+                console.log("transactionHash pause: ", transactionHash);
+                showMessage("Transacción completada");
+            }
+        });
+    }
+
+    //this.paused = this.getPaused();
+  },
+
+  //*
+  //*   prepareOwner: Prepara las opciones disponibles para el owner
+  //*
+  prepareOwner: async function() {
+
+    console.log("--entrando prepareOwner--");
+    console.log("this.account: ", this.account);
+    console.log("this.owner: ", this.owner);
+    console.log("this.account LC: ", this.account.toLowerCase());
+    console.log("this.owner LC: ", this.owner.toLowerCase());
+
+    if (this.account.toLowerCase() == this.owner.toLowerCase()) {
+        document.getElementById("pauseButton").disabled = false;
+    } else {
+        document.getElementById("pauseButton").disabled = true;
+    }
+
+  },
+
+  //*
+  //*   getUserCount: Obtiene el número de usuarios del sistema
+  //*
+  getUserCount: async function() {
+
+    this.setStatus("Se recupera número de usuarios");    
+
+    const { getUserCount } = this.meta.methods;
+    const _userCount = await getUserCount().call();
+
+    console.log("UserCount: ", _userCount);
+
+    const globalUsersElement = document.getElementById("globalUsers");
+    globalUsersElement.innerHTML = _userCount;
+  },   
 
   //*
   //* Obtiene del SC el número de movimientos que tiene la cuenta actual
