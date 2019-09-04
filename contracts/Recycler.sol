@@ -237,7 +237,7 @@ contract Recycler is usingProvable, Pausable {
     //* 2º - En la función __callback se recogerá el valor devuelto por el oráculo para calcular el número de tokens
     //*  a entregar al usuario.
     //*
-    function fetchPrice(string memory _fee) public payable {
+    function fetchPrice(string memory _fee) public payable whenNotPaused {
        require(bytes(_fee).length > 0,"fee code is empty");
 
        // Comprobamos si el contrato tiene saldo suficiente para el pago de la llamada al oráculo

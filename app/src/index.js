@@ -50,12 +50,14 @@ const App = {
           this.eventSet1 = new Set();
           this.eventSet2 = new Set();
           this.eventSet3 = new Set();
-          this.owner = this.getOwner();
-          this.paused = this.getPaused();
+          await this.getOwner();
+          await this.getPaused();
 
           // Log
           console.log("Account: ", this.account);
           console.log("Accounts: ", accounts);
+          console.log("Owner: ", this.owner);
+          console.log("Paused: ", this.paused);
 
           // Escuchamos los cambios en Metamask para poder detectar un cambio de cuenta
           web3.currentProvider.publicConfigStore.on("update", async function(event){
@@ -109,63 +111,7 @@ const App = {
   //*
   //* setEvents: Define el comportamiento de la aplicación antes los eventos que reciba del SC
   //*
-  setEvents: function() {
-    /*
-    this.meta.once("coinSent", function(error, event){ 
-        console.log("--Meta.Once.CointSent--"); 
-        console.log("Error coinSent: ", error);
-        console.log("Event coinSent: ", event);
-
-        let _amount = event.returnValues._amount;
-        let _sToken = (_amount == 1) ? " token ":" tokens ";
-        let _mvt = [event.returnValues._code, event.returnValues._fee, event.returnValues._qty, event.returnValues._uni, _amount];
-
-        console.log("Alerta: ", _amount, " ", _sToken);
-
-        if (!error) {
-            showMessage("Evento coinSent recibido");
-            App.addItem(_mvt);  
-            App.movementCount();
-            alert("Se han ingresado " + String(_amount) + _sToken + "en su cuenta.\n\n"+ "Tx hash:\n" + event.transactionHash);
-        }      
-    });
-    
-    this.meta.once("newUser", function(error, event){ 
-        console.log("--Meta.Once.Newuser--"); 
-        console.log("Error newUser: ", error);
-        console.log("Event newUser: ", event);
-
-        if (!error) {
-            showMessage("Evento newUser recibido");
-            alert("Nuevo usuario creado.\n\n"+"Bienvenido y gracias por reciclar!");
-        }
-            
-    });    
-
-    this.meta.once("newBalance", function(error, event){ 
-        console.log("--Meta.Once.newBalance--"); 
-        console.log("Error newBalancenSent: ", error);
-        console.log("Event newBalance: ", event);
-        if (!error) {
-            showMessage("Evento newBalance recibido");
-            App.refreshBalance();
-        }
-    });
-     
-    console.log("====Resto Eventos=====");
-
-
-    var event = clientReceipt.Deposit();
-
-    // mirar si hay cambios
-    event.watch(function(error, result){
-       // el resultado contendrá varias informaciones incluyendo los argumentos proporcionados en el momento de la llamada a Deposit.
-       if (!error)
-           console.log(result);
-    });
-    */
-    
-
+  setEvents: async function() {
 
     //* 
     //* Tratamiento evento coinSent
@@ -178,11 +124,11 @@ const App = {
         if (!error) {
 
             console.log("CoinSent hash: ", event.transactionHash);
-            console.log("CoinSent eventSet1: ", App.eventSet1);
+            console.log("CoinSent eventSet1: ", this.eventSet1);
 
-            if (!App.eventSet1.has(event.transactionHash)) {
+            if (!this.eventSet1.has(event.transactionHash)) {
 
-                App.eventSet1.add(event.transactionHash);
+                this.eventSet1.add(event.transactionHash);
 
                 let _amount = event.returnValues._amount;
                 let _sToken = (_amount == 1) ? " token ":" tokens ";
@@ -192,12 +138,12 @@ const App = {
                 console.log("Alerta: ", _amount, " ", _sToken);
 
                 showMessage("Evento coinSent recibido");
-                App.addItem(_mvt);  
-                App.movementCount();
+                this.addItem(_mvt);  
+                this.movementCount();
                 alert("Se han ingresado " + String(_amount) + _sToken + "en su cuenta.\n\n"+ "Tx hash:\n" + event.transactionHash);
             }
         }      
-    });
+    }.bind(this));
 
     //* 
     //* Tratamiento evento newBalance
@@ -210,16 +156,16 @@ const App = {
         if (!error) {
 
             console.log("newBalance hash: ", event.transactionHash);
-            console.log("newBalance eventSet2: ", App.eventSet2);
+            console.log("newBalance eventSet2: ", this.eventSet2);
 
-            if (!App.eventSet2.has(event.transactionHash)) {
+            if (!this.eventSet2.has(event.transactionHash)) {
 
-                App.eventSet2.add(event.transactionHash);
-                App.refreshBalance();
+                this.eventSet2.add(event.transactionHash);
+                this.refreshBalance();
                 showMessage("Evento newBalance recibido"); 
             }
         }      
-    });   
+    }.bind(this));   
     
     //* 
     //* Tratamiento evento newUser
@@ -232,16 +178,16 @@ const App = {
         if (!error) {
 
             console.log("newUser hash: ", event.transactionHash);
-            console.log("newUser eventSet3: ", App.eventSet3);
+            console.log("newUser eventSet3: ", this.eventSet3);
 
-            if (!App.eventSet3.has(event.transactionHash)) {
+            if (!this.eventSet3.has(event.transactionHash)) {
 
-                App.eventSet3.add(event.transactionHash);
+                this.eventSet3.add(event.transactionHash);
                 showMessage("Evento newUser recibido");
                 alert("Nuevo usuario creado.\n\n"+"Bienvenido y gracias por reciclar!");
             }
         }      
-    });    
+    }.bind(this));    
 
     //* 
     //* Tratamiento evento Pause
@@ -261,7 +207,8 @@ const App = {
                 this.eventSet1.add(event.transactionHash);
 
                 alert("EL contrato ha sido pausado correctamente\n"+ "Tx hash:\n" + event.transactionHash);
-                this.paused = this.getPaused();
+                this.setStatus("Contrato pausado");
+                this.getPaused();
             }
         }
 
@@ -285,7 +232,8 @@ const App = {
                 this.eventSet1.add(event.transactionHash);
 
                 alert("EL contrato ha sido despausado correctamente\n"+ "Tx hash:\n" + event.transactionHash);
-                this.paused = this.getPaused();
+                this.setStatus("Contrato despausado");
+                this.getPaused();
             }
         }
 
@@ -534,14 +482,25 @@ const App = {
     this.setStatus("Se recupera owner del contrato");
 
     const { owner } = this.meta.methods;
-    const _owner = await owner().call();
+    await owner().call(function(error, response){
 
-    console.log("Owner: ", _owner);    
+        console.log("callback owner error: ", error);
+        console.log("callback owner response: ", response); 
 
-    const ownerElement = document.getElementById("owner");
-    ownerElement.innerHTML = _owner;
+        if (error) {
+            showMessage(error);
+        } else {
+            const _owner = response;
 
-    return _owner;
+            console.log("Owner: ", _owner);    
+
+            const ownerElement = document.getElementById("owner");
+            ownerElement.innerHTML = _owner;
+        
+            this.owner = _owner;
+        }
+               
+    }.bind(this));
   },
 
   //*
@@ -552,19 +511,27 @@ const App = {
     this.setStatus("Se recupera estado (paused) del contrato");    
 
     const { paused } = this.meta.methods;
-    const _paused = await paused().call();
+    await paused().call(function(error, response) {
 
-    console.log("Paused: ", _paused);
+        console.log("callback paused error: ", error);
+        console.log("callback paused response: ", response);         
 
-    const pausedElement = document.getElementById("paused");
-    pausedElement.innerHTML = (_paused) ? "Si":"No";
+        if (error) {
+            showMessage(error);
+        } else {
+            const _paused = response;
 
-    if (_paused) {
-        const pauseButton = document.getElementById("pauseButton");
-        pauseButton.innerHTML = "Unpause";
-    }
+            console.log("Paused: ", _paused);
 
-    return _paused;
+            const pausedElement = document.getElementById("paused");
+            const pauseButton = document.getElementById("pauseButton");
+
+            pausedElement.innerHTML = (_paused) ? "Si":"No";
+            pauseButton.innerHTML = (_paused) ? "Unpause":"Pause";
+
+            this.paused = _paused;
+        }
+    }.bind(this));
   },  
 
   //*
@@ -574,7 +541,7 @@ const App = {
 
     console.log("--entrando pause--");
 
-    this.paused = await this.getPaused();
+    await this.getPaused();
 
     if (this.paused) {
 
@@ -608,8 +575,6 @@ const App = {
             }
         });
     }
-
-    //this.paused = this.getPaused();
   },
 
   //*
