@@ -276,8 +276,7 @@ contract Recycler is usingProvable, Pausable {
     //*
     function __callback(bytes32 _myid, string memory _result) public {
        require(pendingQueries[_myid].isPending, "there is not any query pending with that ID");
-
-       if (msg.sender != provable_cbAddress()) revert();
+       require(msg.sender == provable_cbAddress(), "address not valid for the callback");
 
        uint _price = parseInt(_result);
        emit LogPriceUpdated(_result);
@@ -321,6 +320,7 @@ contract Recycler is usingProvable, Pausable {
     function deleteUser(address _addr) public onlyOwner {
         require (_addr != address(0), "a valid address is required");
 
+        // Solo se elimina si hubiese tenido alguna operación (dtUltMvt: fecha ult. mvto.)
         if (users[msg.sender].dtUltMvt != 0) {
 
             listaUsers[users[msg.sender].seq] = address(0);
@@ -446,7 +446,7 @@ contract Recycler is usingProvable, Pausable {
     //*
     //* Función para desactivar de forma permanente el contrato (solo por el owner)
     //*
-    function kill() public payable onlyOwner {
+    function kill() public payable onlyOwner whenPaused {
         require (globalBalance == 0, "global balance is not zero");
         selfdestruct(msg.sender);
     }
@@ -457,7 +457,7 @@ contract Recycler is usingProvable, Pausable {
     // Added so ether sent to this contract is reverted if the contract fails
     // otherwise, the sender's money is transferred to contract
     function () external payable {
-        //revert();
+        revert();
     }
 
 }
