@@ -3853,9 +3853,9 @@
           }
         ],
         "contractDependencies": [
+          112,
           189,
           463,
-          112,
           7974
         ],
         "contractKind": "contract",
@@ -20597,9 +20597,9 @@
           }
         ],
         "contractDependencies": [
+          112,
           189,
           463,
-          112,
           7974
         ],
         "contractKind": "contract",
@@ -33615,7 +33615,7 @@
   },
   "networks": {},
   "schemaVersion": "3.0.11",
-  "updatedAt": "2019-09-05T18:18:26.091Z",
+  "updatedAt": "2019-09-05T21:17:06.774Z",
   "devdoc": {
     "methods": {}
   },

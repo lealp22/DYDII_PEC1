@@ -16,6 +16,9 @@ const App = {
   owner: null,
   paused: false,
 
+  //*
+  //*   start: Función inicial
+  //*
   start: async function() {
       const { web3 } = this;
 
@@ -27,6 +30,7 @@ const App = {
       try {
           // get contract instance
           const networkId = await web3.eth.net.getId();
+          console.log("networkId: ", networkId);          
           const deployedNetwork = recyclerArtifact.networks[networkId];
           this.meta = new web3.eth.Contract(
               recyclerArtifact.abi,
@@ -34,7 +38,6 @@ const App = {
           );
 
           // Log
-          console.log("networkId: ", networkId);
           console.log("deployedNetwork.address: ", deployedNetwork.address);
           console.log("deployedNetwork: ", deployedNetwork);
           //console.log("recyclerArtifact: ", recyclerArtifact);
@@ -130,10 +133,10 @@ const App = {
 
                 this.eventSet1.add(event.transactionHash);
 
-                let _amount = event.returnValues._amount;
+                let _amount = event.returnValues.amount;
                 let _sToken = (_amount == 1) ? " token ":" tokens ";
-                let _mvt = [event.returnValues._code, event.returnValues._fee, event.returnValues._qty, 
-                            event.returnValues._uni, _amount];
+                let _mvt = [event.returnValues.code, event.returnValues.fee, event.returnValues.qty, 
+                            event.returnValues.uni, _amount];
 
                 console.log("Alerta: ", _amount, " ", _sToken);
 
@@ -190,9 +193,9 @@ const App = {
     }.bind(this));    
 
     //* 
-    //* Tratamiento evento Pause
+    //* Tratamiento evento Paused
     //*
-    let eventPause = this.meta.events.Pause({ filter: {_sender: this.address}}, function(error, event){ 
+    let eventPause = this.meta.events.Paused({ filter: {_sender: this.address}}, function(error, event){ 
 
         console.log("Evento Pause: ", event);
         console.log("Error Pause: ", error);
@@ -215,9 +218,9 @@ const App = {
     }.bind(this));
 
     //* 
-    //* Tratamiento evento Unpause
+    //* Tratamiento evento Unpaused
     //*
-    let eventUnpause = this.meta.events.Unpause({ filter: {_sender: this.address}}, function(error, event){ 
+    let eventUnpause = this.meta.events.Unpaused({ filter: {_sender: this.address}}, function(error, event){ 
 
         console.log("Evento Unpause: ", event);
         console.log("Error Unpause: ", error);

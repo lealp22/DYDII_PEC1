@@ -461,10 +461,10 @@
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        7987,
-                        7988
+                        7992,
+                        7993
                       ],
-                      "referencedDeclaration": 7988,
+                      "referencedDeclaration": 7993,
                       "src": "1237:7:2",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
@@ -566,10 +566,10 @@
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        7987,
-                        7988
+                        7992,
+                        7993
                       ],
-                      "referencedDeclaration": 7988,
+                      "referencedDeclaration": 7993,
                       "src": "1429:7:2",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
@@ -1294,10 +1294,10 @@
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        7987,
-                        7988
+                        7992,
+                        7993
                       ],
-                      "referencedDeclaration": 7988,
+                      "referencedDeclaration": 7993,
                       "src": "1237:7:2",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
@@ -1399,10 +1399,10 @@
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        7987,
-                        7988
+                        7992,
+                        7993
                       ],
-                      "referencedDeclaration": 7988,
+                      "referencedDeclaration": 7993,
                       "src": "1429:7:2",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
@@ -1776,7 +1776,7 @@
   },
   "networks": {},
   "schemaVersion": "3.0.11",
-  "updatedAt": "2019-09-05T16:54:33.769Z",
+  "updatedAt": "2019-09-05T21:17:06.727Z",
   "devdoc": {
     "details": "Contract module which allows children to implement an emergency stop mechanism that can be triggered by the contract owner. * This module is used through inheritance. It will make available the modifiers `whenNotPaused` and `whenPaused`, which can be applied to the functions of your contract. Note that they will not be pausable by simply including this module, only once the modifiers are put in place.",
     "methods": {
