@@ -4,8 +4,8 @@ import "./provableAPI_0.5.sol";
 import "./SafeMath.sol";
 import "./Pausable.sol";
 
-/** @title  UserFactory (Factory - Contrato hijo). 
-  * @notice Utilizado para gestionar de forma individual los movimientos de un usuario 
+/** @title  UserFactory (Factory - Contrato hijo).
+  * @notice Utilizado para gestionar de forma individual los movimientos de un usuario
   *         del sistema
   */
 contract UserFactory {
@@ -31,14 +31,14 @@ contract UserFactory {
 
     /**
       * @dev Evento que se emitirá con la creación de cada movimiento
-      */      
+      */
     event newMovement(
         address indexed owner, address indexed factory, uint amount, uint balance, uint count
     );
 
     /**
       * @dev Validará que el sender sea el contrato padre
-      */      
+      */
     modifier onlyFactory() {
         require(msg.sender == factory,"sender is not the factory contract");
         _;
@@ -47,7 +47,7 @@ contract UserFactory {
     /**
       * @dev Constructor.
       * @dev El owner será el indicado por el contrato que llama (msg.sender)
-      * @param _owner
+      * @param _owner El owner deberá ser indicado pues el sender es el contrato padre
       */
     constructor(address _owner) public {
         owner = _owner;
@@ -60,12 +60,12 @@ contract UserFactory {
       *      Se Validará:
       *      - La cantidad (qty) sea un número entre 1 y 1000
       *      - código del envase (code) y la unidad de medida (uni) vengan informados
-      * @param _code
-      * @param _fee
-      * @param _qty
-      * @param _uni
-      * @param _amount
-      */    
+      * @param _code código del envase
+      * @param _fee  tarifa
+      * @param _qty  cantidad
+      * @param _uni  unidad de medida (UNI o KGM)
+      * @param _amount tokens asignados
+      */
     function addMovement(string memory _code, string memory _fee, uint32 _qty, string memory _uni, uint _amount) public onlyFactory {
         require(_qty > 0,"quantity is not greater than zero");
         require(_qty <= 1000,"quantity is too high");
@@ -109,7 +109,7 @@ contract UserFactory {
       * @return qty
       * @return uni
       * @return amount
-      * @return date 
+      * @return date
       */
     function getMovement(uint _ind) external view returns(string memory, string memory, uint32, string memory, uint, uint) {
         require (_ind > 0,"value must be greater than zero");
@@ -124,11 +124,11 @@ contract UserFactory {
 }
 
 //**************************************************************************************************
-/** @title  Recycler (Contrato padre). 
-  * @notice Contrato para la asignación de tokens a una dirección de Ethereum como recompensa 
-  *         por la entrega de un envase para su reciclado. Dicho envase se identificará por el 
-  *         código de barra en la etiqueta y, si tuviese asignado una tarifa (fee), el número 
-  *         de tokens que corresponda a dicha tarifa se multiplicará por el número de unidades 
+/** @title  Recycler (Contrato padre).
+  * @notice Contrato para la asignación de tokens a una dirección de Ethereum como recompensa
+  *         por la entrega de un envase para su reciclado. Dicho envase se identificará por el
+  *         código de barra en la etiqueta y, si tuviese asignado una tarifa (fee), el número
+  *         de tokens que corresponda a dicha tarifa se multiplicará por el número de unidades
   *         entregadas. Si no fuese el caso, se asignará un token por cada unidad.
   *
   *         Para la obtención de los tokens correspondientes a una tarifa se utilizará un
@@ -207,7 +207,7 @@ contract Recycler is usingProvable, Pausable {
     /**
       * @dev LogNewProvableQuery: Evento log nueva query
       */
-    event LogNewProvableQuery(string description); 
+    event LogNewProvableQuery(string description);
 
     /**
       * @dev Constructor
@@ -220,7 +220,7 @@ contract Recycler is usingProvable, Pausable {
 
     /**
       * @dev Función para el traspaso de tokens a la cuenta del usuario
-      *      Si se indica una tarifa (prodFee) se debe llamar al oráculo para consultar el  
+      *      Si se indica una tarifa (prodFee) se debe llamar al oráculo para consultar el
       *      precio (número de token que se debe entregar por cada unidad)
       * @param prodCode código envase
       * @param prodFee  código tarifa
@@ -252,12 +252,12 @@ contract Recycler is usingProvable, Pausable {
     }
 
     /**
-      * @dev Segunda parte de la función sendCoin que se ejecutará tras tener la tarifa (price) 
+      * @dev Segunda parte de la función sendCoin que se ejecutará tras tener la tarifa (price)
       *      de tokens a entregar
       * @param _price  precio tarifa
       * @param _sender address del movimiento
       * @param _trans  movimiento (struct Mvt)
-      */            
+      */
     function sendCoin_cont(uint _price, address _sender, Mvt memory _trans) internal {
 
         uint _amount;
@@ -280,15 +280,15 @@ contract Recycler is usingProvable, Pausable {
     }
 
     /**
-      * @dev Función para obtener el número de tokens que se pagará por cada unidad recogida (según la tarifa 
+      * @dev Función para obtener el número de tokens que se pagará por cada unidad recogida (según la tarifa
       * indicada) -1ra parte-
       *
-      * Para ello se utiliza un oráculo creado con Provable (antiguo Oraclize) al que se le indicará la 
+      * Para ello se utiliza un oráculo creado con Provable (antiguo Oraclize) al que se le indicará la
       * URL de una API web que devolverá el número de tokens para la tarifa (_fee) enviada.
       *
       * La obtención del número de tokens se deberá hacer en dos pasos:
       * 1º - En esta función se enviará la query al oráculo
-      * 2º - En la función __callback se recogerá el valor devuelto por el oráculo para calcular el número 
+      * 2º - En la función __callback se recogerá el valor devuelto por el oráculo para calcular el número
       *      de tokens a entregar al usuario.
       * 
       * @param _fee tarifa para la que se deberá calcula el precio
@@ -318,13 +318,13 @@ contract Recycler is usingProvable, Pausable {
            // El contador countQueries nos permitirá sabér cuántas queries hay pendientes de procesar
            countQueries = SafeMath.add32(countQueries, 1);
 
-           // DEBUG: Guardamos el ID de la peticiones para, en caso de ser necesario, poder recuperarlos y revisar qué pasa 
+           // DEBUG: Guardamos el ID de la peticiones para, en caso de ser necesario, poder recuperarlos y revisar qué pasa
            pendTx1.push(queryId);
        }
     }
 
     /**
-      * @dev Función para obtener el número de tokens que se pagará por cada unidad recogida (según la tarifa indicada) 
+      * @dev Función para obtener el número de tokens que se pagará por cada unidad recogida (según la tarifa indicada)
       * -2da parte-
       *
       * Revisamos que el ID enviado (_myid) correponda con algunas de las queries para las que esperamos respuesta y que
@@ -377,7 +377,7 @@ contract Recycler is usingProvable, Pausable {
     }
 
     /**
-      * @dev Función para borrar los datos de una cuenta en caso de que fuese necesario 
+      * @dev Función para borrar los datos de una cuenta en caso de que fuese necesario
       * (solo por el owner)
       * @param _addr Direccion cuenta a borrar
       */
@@ -426,14 +426,14 @@ contract Recycler is usingProvable, Pausable {
 
     /**
       * @dev Función para consultar el saldo en Ethers del contrato (necesario para el pago de gas para el Oráculo)
-      * @return Saldo tokens de la cuenta con que se esté trabajando  
+      * @return Saldo tokens de la cuenta con que se esté trabajando
       */
     function getContractBalance() public view returns(uint) {
         return address(this).balance;
     }
 
     /**
-      * @dev Función utilizada para transferir fondos (Ethers) al contrato 
+      * @dev Función utilizada para transferir fondos (Ethers) al contrato
       * @param _message  Mensaje que se desea enviar
       * @return _message Devuelve el mismo mensaje de entrada
       */
@@ -452,7 +452,7 @@ contract Recycler is usingProvable, Pausable {
         owner.transfer(_amount);
     }
       */
-    function transfer() public onlyOwner {
+    function transfer() public payable onlyOwner {
         require (address(this).balance >= msg.value, "not enough balance");
         require (msg.value != 0, "value is zero");
 
@@ -471,8 +471,8 @@ contract Recycler is usingProvable, Pausable {
       * @return _tx.qty
       * @return _tx.uni
       * @return _tx.amount
-      * @return _tx.date                      
-      */      
+      * @return _tx.date
+      */
     function getMovement(address _addr, uint _ind) external view returns(string memory, string memory, uint32, string memory, uint, uint) {
         require (_addr != address(0), "an address is required");
         require (_ind > 0,"value must be greater than zero");
@@ -498,7 +498,7 @@ contract Recycler is usingProvable, Pausable {
     }
 
     /**
-      * @dev Función para obtener la lista usuarios que han utilizado el sistema (se obtiene 
+      * @dev Función para obtener la lista usuarios que han utilizado el sistema (se obtiene
       *      una address por llamada)
       * @param _ind posición en la lista
       * @return dirección de usuario
@@ -557,7 +557,7 @@ contract Recycler is usingProvable, Pausable {
       * otherwise, the sender's money is transferred to contract
       */
     function () external payable {
-        revert();
+        revert("Fallback function");
     }
 
 }
