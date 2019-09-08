@@ -1,5 +1,6 @@
 import Web3 from "web3";
-import recyclerArtifact from "../../build/contracts/Recycler.json";
+//import recyclerArtifact from "../../build/contracts/Recycler.json";
+import recyclerArtifact from "../dist/contracts/Recycler.json";
 
 const App = {
   web3: null,
@@ -61,7 +62,7 @@ const App = {
           console.log("Accounts: ", accounts);
           console.log("Owner: ", this.owner);
           console.log("Paused: ", this.paused);
-
+/* 
           // Escuchamos los cambios en Metamask para poder detectar un cambio de cuenta
           web3.currentProvider.publicConfigStore.on("update", async function(event){
             
@@ -78,10 +79,11 @@ const App = {
             }
 
           }.bind(this));
-
+ */
           const networkIdElement = document.getElementById("red");
           networkIdElement.innerHTML = networkId;
-
+          
+          this.initializeTableItems();
           this.getUserCount();
           this.loadAccount();
 
@@ -133,10 +135,10 @@ const App = {
 
                 this.eventSet1.add(event.transactionHash);
 
-                let _amount = event.returnValues.amount;
+                let _amount = event.returnValues._amount;
                 let _sToken = (_amount == 1) ? " token ":" tokens ";
-                let _mvt = [event.returnValues.code, event.returnValues.fee, event.returnValues.qty, 
-                            event.returnValues.uni, _amount];
+                let _mvt = [event.returnValues._code, event.returnValues._fee, event.returnValues._qty, 
+                            event.returnValues._uni, _amount];
 
                 console.log("Alerta: ", _amount, " ", _sToken);
 
@@ -202,14 +204,14 @@ const App = {
 
         if (!error) {
 
-            console.log("CoinSent hash: ", event.transactionHash);
-            console.log("CoinSent eventSet1: ", this.eventSet1);
+            console.log("Paused hash: ", event.transactionHash);
+            console.log("Paused eventSet1: ", this.eventSet1);
     
             if (!this.eventSet1.has(event.transactionHash)) {
     
                 this.eventSet1.add(event.transactionHash);
 
-                alert("EL contrato ha sido pausado correctamente\n"+ "Tx hash:\n" + event.transactionHash);
+                alert("El contrato ha sido pausado correctamente\n"+ "Tx hash:\n" + event.transactionHash);
                 this.setStatus("Contrato pausado");
                 this.getPaused();
             }
@@ -227,8 +229,8 @@ const App = {
 
         if (!error) {
 
-            console.log("CoinSent hash: ", event.transactionHash);
-            console.log("CoinSent eventSet1: ", this.eventSet1);
+            console.log("Unpaused hash: ", event.transactionHash);
+            console.log("Unpaused eventSet1: ", this.eventSet1);
     
             if (!this.eventSet1.has(event.transactionHash)) {
     
@@ -765,6 +767,24 @@ window.addEventListener("load", function() {
       App.web3 = new Web3(window.ethereum);
       window.ethereum.enable(); // get permission to access accounts
       showMessage("Web3 detected");
+
+      // Escuchamos los cambios en Metamask para poder detectar un cambio de cuenta
+      App.web3.currentProvider.publicConfigStore.on("update", async function(event){
+            
+        console.log("NEW-Metamask update new account: ", event.selectedAddress);
+        console.log("NEW-Metamask update event: ", event);
+        console.log("NEW-Metamask cuenta actual: ", App.account);
+        console.log("NEW-Metamask typeof cuenta actual: ", typeof App.account);
+
+        // Se valida si la cuenta seleccionada en Metamask ha cambiado
+        if (event.selectedAddress.toLowerCase() != App.account.toLowerCase()) {
+
+            document.getElementById("eventsLog").innerHTML = "";
+            App.start();
+        }
+
+      })
+
   } else {
       console.warn(
           "No web3 detected. Falling back to http://127.0.0.1:9545. You should remove this fallback when you deploy live",
@@ -774,6 +794,7 @@ window.addEventListener("load", function() {
       App.web3 = new Web3(
           new Web3.providers.HttpProvider("http://127.0.0.1:9545"),
       );
+      alert("Es necesario tener instalado Metamask\n para poder utilizar esta Dapp");
   }
 
   App.start();

@@ -73,12 +73,12 @@ contract UserFactory {
         require(bytes(_uni).length > 0,"unit code is empty");
 
         Mvt memory _tx;
-
+/* 
         // Si el código de comisión está vacío, los campos amount y qty deben ser iguales (price=1)
         if (bytes(_fee).length == 0 && _amount != _qty) {
             revert("Price does not correspond with a empty fee");
         }
-
+ */
         // Construimos la transacción
         _tx.code = _code;
         _tx.fee = _fee;
@@ -215,6 +215,10 @@ contract Recycler is usingProvable, Pausable {
     constructor() public payable {
         //owner = msg.sender;
         createUser();
+
+        //Se crea un movimiento justificante del abono de 10000 tokens
+        users[msg.sender].countMvts = SafeMath.add32(users[msg.sender].countMvts, 1);
+        users[msg.sender].userContr.addMovement("coinbase", "", 1, "UNI", 10000);
         addBalance(msg.sender, 10000);
     }
 
@@ -290,7 +294,7 @@ contract Recycler is usingProvable, Pausable {
       * 1º - En esta función se enviará la query al oráculo
       * 2º - En la función __callback se recogerá el valor devuelto por el oráculo para calcular el número
       *      de tokens a entregar al usuario.
-      * 
+      *
       * @param _fee tarifa para la que se deberá calcula el precio
       */
     function fetchPrice(string memory _fee) public payable whenNotPaused {
@@ -445,20 +449,20 @@ contract Recycler is usingProvable, Pausable {
 
     /**
       * @dev Función para transferir el saldo en Ethers del contrato al owner (solo por el owner)
-      *
+      */
     function transfer(uint _amount) public onlyOwner {
         require (address(this).balance >= _amount, "not enough balance");
 
         owner.transfer(_amount);
     }
-      */
+    /*
     function transfer() public payable onlyOwner {
         require (address(this).balance >= msg.value, "not enough balance");
         require (msg.value != 0, "value is zero");
 
         owner.transfer(msg.value);
     }
-
+    */
     /**
       * @dev Función para consultar los movimientos de una cuenta (uno por llamada)
       *      Se requiere la dirección de la cuenta y el indíce del movimiento
