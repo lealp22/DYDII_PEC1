@@ -34,11 +34,18 @@ token por cada unidad recolectada.
 ## ¿Cómo instalar y configurar?
 ...
 
-### Versiones programas utilizados
+### Versiones programas instalados
 
 - Truffle v5.0.24  
 - Node v8.10.0  
 - Solc: 0.5.0+commit  
+
+lealp22@lealp22-VirtualBox:~/dapp_PEC1$ npm list -g --depth 0
+/usr/local/lib
+├── ganache-cli@6.4.4
+├── npm@6.9.0
+├── solc@0.5.10
+└── truffle@5.0.24
 
 
 ## Casos de uso
@@ -61,6 +68,10 @@ Su versión original se puede encontrar en:
 [https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/math/SafeMath.sol](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/math/SafeMath.sol)
 
 >Sin embargo, se ha modificado para incluir dos funciones nuevas para la suma y resta de enteros de 32 bytes (para los contadores utilizados en _Recycler.sol_)
+
+
+Mencionar que esta librería no necesita ser desplegada por separado, por lo que no es necesario vincularla en el deploy de los contratos.
+Todas las funciones de _Safemath_ son _internal_, por lo que la EVM simplemente la incluye dentro del contrato.
 
 ---
 ## SMART CONTRACTS - Uso de algún mecanismo como Herencia o Factory Contracts
@@ -140,12 +151,115 @@ Esto es gestionado a través de los eventos **Paused()** y **Unpaused()**.
 
 ## SMART CONTRACTS - Comentar los contratos según lo indicado en https://solidity.readthedocs.io/en/latest/layout-of-source-files.html#comments
 
+Se han incluido los comentarios en Recycler.sol
+
 ---
 ## TESTING - Justifiación test creados y explicación función que realizan cada uno.
 
+**- Test "Se crea un usuario correctamente con el despliegue del contrato"**
+
+Intenta validar las acciones realizadas con el despliegue del contrato (_constructor_).
+  
+Se valida que:
+- Tras el despliegue el contador de usuarios es 1
+- Que la dirección de ese primer usuario es la primera cuenta (coinbase)
+     
+  
+**- Test "El sado de la primera cuenta y el sado global de la Dapp son 10000 token"**
+
+Complementa el test anterior en intentar validar las acciones realizadas con el despliegue del contrato (_constructor_)_.
+     
+Se valida que:
+- El saldo del primer usuario es 10.000 tokens (asignados en el constructor)
+- El usuario tiene registrada una transacción (movimiento) por dichos tokens
+- Lo 10.000 tokens se reflejan en el saldo global de la Dapp
+     
+
+**- Test "Pago de tokens a una cuenta y registro del movimiento"**
+
+La prueba realiza una transferencia de tokens, que sería la función base de la app, enviando 5 tokens a la cuenta base. Se intenta verificar el estado final de la cuenta de destino y del movimiento que deja constancia de ello.
+     
+Se valida que:
+- El saldo de la cuenta se incrementa en 5 tokens (10.005 tokens)
+- El saldo global también se incrementa en 5 tokens (10.005 tokens)
+- Se crea una nueva transacción (movimiento) para dicha cuenta (2 mvtos)
+- Que los valores de este movimiento coinciden con los enviados
+       
+**- Test "Pago de tokens a una segunda cuenta con su alta en la Dapp y el registro del movimiento"**
+
+Se intenta realizar una transferencia de 5 tokens a una nueva cuenta, lo que conlleva el alta de esta como usuario del sistema, con lo que se verifica el alta de la cuenta, su estado tras la transferencia y el estado de la Dapp.
+     
+Se valida que:
+- El saldo de la cuenta es de 5 tokens 
+- Dicha cuenta tiene un movimiento
+- Que los valores de este movimiento coinciden con los enviados
+- El contador de usuario de la Dapp se incrementa a 2
+- Que este segundo usuario coincide con la cuenta utilizada
+- El saldo global se incrementa en 5 tokens (10.010 tokens)
+         
+  
+**- Test "Generación de eventos"**
+
+?????????????????????????????????
+     
+Se realiza una transferencia de 7 tokens a una nueva cuenta
+     
+Se valida que:
+- Se ejecuta el evento newUser
+- Se ejecuta el evento newBalance
+- Se ejecuta el evento coinSent
+- Que los valores enviados en el evento cointSent coinciden con los de la transferencia
+       
+  
+**- Test "LLama a una función de Pausable.sol para comprobar la herencia" 
+     
+LLama a una función de Pausable.sol para comprobar que esté disponible
+     
+
+**- Test "Activar y desactivar la pausa (circuit break) de la Dapp"
+     
+Activa y desactiva los estados que implementan el "circuit break" de la Dapp
+     
+Se valida:
+- El estado de la Dapp tras ejecutar la acciones de Pause Unpause
+- Se emiten los eventos correspondientes
+     
+  
+**- Test "LLama a una función de Ownable.sol para comprobar la herencia"   
+     
+LLama a una función de Ownable.sol para comprobar que esté disponible
+     
+
+**- Test "Enviar y recibir Ethers"
+     
+Test de funciones para manejar el saldo en Ethers del contrato
+     
+Para ello:
+- Se traspasan weis al contrato
+- Se consulta el saldo  
+- Se traspasan los weis al owner
+     
+Se valida que el saldo inicial y final son iguales, mientras que el intermedio es superior
+     
+  
+**- Test "Se detiene el contrato (Pause) y se intenta enviar tokens"
+     
+Se detiene el contrato (Pause) para activar el "circuit break" y se valida que no se pueden realizarse transacciones
+
+- No se ha podido probar el correcto funcionamiento del oráculo al no estar 
+
+
 ## TESTING - Todos los test se ejecutan satisfactoriamente.
 
+Todos los test se ejecutan satisfactoriamente:
+
+![Resultado test](./images/Screenshot_test.jpg)
+
+
 ## TESTING - Realizar comentarios sobre el código de los tests.
+
+Todos los tests han sido comentados dentro de test/recycler.js
+
 ---
 ## EXTRAS - Alojar el/los contrato/s en una testnet y verificar el código
 Detallar procedimiento e indicar las direcciones
