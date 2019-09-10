@@ -9,7 +9,9 @@ En construcción...
 ## Indice
 
 - [Acerca esta Dapp](#acerca-esta-dapp)
-
+- [Funcionamiento](#funcionamiento)
+- [Estructura](#estructura)
+- [Entorno](#entorno)
 - [Puntos evaluables](#puntos-evaluables)
 
 ---
@@ -19,18 +21,17 @@ En construcción...
 Esta Dapp intenta simular el mecanismo con el que se le gratificaría a un usuario por la
 entrega de envases para su reciclado.
 
-Básicamente se introduciría el código de barras en la etiqueta del envase y, siempre que
-estuviese registrado en el sistema, se asignaría una cantidad de tokens establecidos por
-una tarifa definida para dicho envase. En caso de no estar registrado, se asignaría un
-token por cada unidad recolectada.
+Básicamente se introduciría el código de barras quu está en la etiqueta del envase y, siempre que estuviese registrado en el sistema, se asignaría una cantidad de tokens establecidos por una tarifa definida para dicho envase. En caso de no estar registrado, se asignaría un token por cada unidad recolectada.
 
 ![./images/Recycler3.jpg](./images/Recycler3.jpg)  
 [Fuente: 20minutos.es](https://blogs.20minutos.es/capeando-la-crisis/2018/02/07/maquinas-que-dan-dinero-por-reciclar-botellas-de-plastico-las-queremos-en-espana/)  
 
+Esta Dapp se ha desarrollado con webpack tomando [Metacoin](https://www.trufflesuite.com/tutorials/building-testing-frontend-app-truffle-3) como punto de partida.
+
 ---
 ## Funcionamiento
 
-La página web de la aplicación lucirá de forma similar:
+La página web de la aplicación lucirá de la siguiente forma:
 
 ![Screenshot_1.jpg](./images/Screenshot_1.jpg)
 ![Screenshot_2.jpg](./images/Screenshot_2.jpg)
@@ -38,70 +39,185 @@ La página web de la aplicación lucirá de forma similar:
 
 Contando con los siguientes elementos:
 
-Lateral derecho: 
-----------------
-Muestra información sobre la cuenta con la que se está trabajando en el momento e información sobre elementos del entorno.
+### Panel lateral izquierdo: 
+
+Muestra información sobre la cuenta con la que se está trabajando y la sesión.
 
 Este se compone de:
 
-- **Estado**: muestra la última acción relevante realizada por la Dapp en relación a la cuenta que se está utilizando.
+- **Estado**: Muestra la última acción relevante realizada por la Dapp en relación a la cuenta que se está utilizando.
 
-- **Cuenta**: Dirección de la cuenta con la se está trabajando 
+- **Cuenta**: Dirección de la cuenta con la se está trabajando.
 
-- **Saldo tokens:** Saldo asignado a la cuenta (en términos de tokens).
+- **Saldo tokens:** Saldo de tokens asignado a la cuenta.
 
 - **Red**: Id de la red sobre la que se está trabajando.
 
-- **Log**: Cuadro de texto en el que se van acumulando los mensaje
+- **Log**: Log en el que se muestra el historial de mensajes que ha aparecido en el recuadro de _'Estado'_.
 
+![Panel Lateral Izquierdo](./images/panel-lateral.jpg)
 
+### Panel 'Recolección':
 
+Area donde el usuario deberá introducir los datos del envase a reciclar y a partir de los cuales se asignarán en compensación un número determinado de tokens:
 
-## ¿Cómo instalar y configurar en local?
+Los campos son los siguientes:
 
-1) Fire up your favourite console & clone this repo somewhere:
+- **Código**: Codigo de barra que aparece en la etiqueta del envase a reciclar. Puede utilizarse cualquier código, sin embargo, los indicados en [Productos registrados](#productos-registrados) tienen una tarifa asignada y utilizan el oráculo para recuperar el número de tokens a asignar. Para el resto se entrega un token por unidad.
 
-❍ git clone https://github.com/provable-things/ethereum-examples.git
+- **Descripción**: Se muestra la descripción asociada al código (si registrada).
 
-2) Enter this directory & install dependencies:
+- **Cantidad**: Número de unidades entregadas.
 
-❍ cd ethereum-examples/solidity/truffle-examples/diesel-price && npm install
+- **Medida**: Unidad de medida (Unidades o Kilos).
 
-3) Launch Truffle:
+- **Tokens**: Número de tokens que serán entregados. Si el código está registrado se calculará multiplicando el número de tokens de la tarifa correspondiente por el número de unidades entregadas. Si no, se entregará un token por cada unidad.
 
-❍ npx truffle develop
+- **Botón \[Enviar]**: Botón para realizar la transacción. Se habilita al introducir un código.
 
-4) Open a new console in the same directory & spool up the ethereum-bridge:
+![Panel Recolección](./images/recoleccion.jpg)
 
-❍ npx ethereum-bridge -a 9 -H 127.0.0.1 -p 9545 --dev
+### Panel 'Últimas Recolecciones':
 
-5) Once the bridge is ready & listening, go back to the first console with Truffle running & set the tests going!
+En esta área se muestran las últimas 5 transacciones realizadas con la cuenta con que se está trabajando.
 
-❍ truffle(develop)> test
+Los campos de la tablas corresponden a los campos introducidos en el panel de _'Recolección'_.
 
+Bajo esta tabla se muestra el número total de transacciones de la cuenta.
 
-### Versiones programas instalados
+![Últimas recolecciones](./images/ultimas_recolecciones.jpg)
+
+_Observación_: 
+- La cuenta del _owner_ siempre tendrá una primera transacción con el código 'coinbase' que justifica los 10.000 tokens que le son entregados con el despliegue del contrato.
+- Actualmente se muestra en la columna _'Descripción'_ la tarifa que se haya utilizado para calcular los tokens. Esto se utiliza así para poder comprobar el valor devuelto por el oráculo.
+
+### Panel 'Información del Sistema':
+
+En esta área se muestra información general del sistema:
+
+- **Tokens en circulación**: Número total de tokens existentes en las cuentas de los usuarios.
+
+- **Usuarios totales**: Número total de usuarios (únicos) que han utilizado la Dapp.
+
+- **Owner**: Dirección del owner del contrato.
+
+- **Paused**: Indica el estado de la Dapp en cuanto a si se ha activado el 'circuit break'.
+
+- **Botón \[Pause]/\[Unpause]**: Botón que permite activar/desactivar la parada del sistema. Solo se habilita para el _owner_. Una vez activada solo se permiten realizar operaciones de consulta o detener por completo el contrato (funcionalidad no implementada en UI)
+
+![Información del Sistema](./images/informacion-sistema.jpg)
+
+---
+
+## Productos registrados
+
+Estos son los códigos de barra que actualmente tiene una tarifa asociada y para las que se utiliza el oráculo para obtener el número de tokens que les corresponden.
+
+| Código | Descripción | Tarifa | Tokens |
+|--------|-------------|--------|--------|
+| 8410128160319 | Agua Mineral Bezoya 50cl | F0101 | 10 |
+| 8411547001009 | Agua Mineral Solan De Cabras 75cl | F0101 | 10 |
+| 8410297110979 | Leche Entera Asturiana 2,2L | F0101 | 10 |
+| 8411800318950 | Trina Naranja 33cl | F0102 | 15 |
+
+La información de estos código es consultadas a través APIs genéricas provistas por [mLab](https://mlab.com).
+
+---
+
+## Estructura de la Dapp
+
+| Directorio | Descripción |
+|------------|--------------|
+|./app   | Archivos Javascript y plantilla HTML para nuestra Dapp |
+|./build | "Artifacts" u objetos generados en la compilación de los Smart Contracts y  que se almacenan en formato JSON. Contiene información importante que la DApp puede aprovechar (por ejemplo, dirección del contrato, ABI) |
+| ./contracts  | Archivos fuentes de los Smart Contracts |
+| ./migrations | Scripts para la implementación del contrato |
+| ./test | Scripts para test unitarios
+| ./truffle-config.js | Configuración para Truffle |
+| ./webpack.config.js | Configuración para Webpack |
+
+### Entorno
+
+Se requiere tener instalado en el entorno el siguiente software:
+
+- Git
+- Npm
+- Node.js
+- Truffle
+- Metamask
+- Ganache (opcional)
+
+Las versiones instalas al probar esta Dapp eran las siguientes:
 
 - Truffle v5.0.24  
 - Node v8.10.0  
-- Solc: 0.5.0+commit  
+- Solc v0.5.10
+- Npm v6.9.0
+- Ganacle-cli@6.4.4
+- MetaMask v7.1.1
 
-lealp22@lealp22-VirtualBox:~/dapp_PEC1$ npm list -g --depth 0
-/usr/local/lib
-├── ganache-cli@6.4.4
-├── npm@6.9.0
-├── solc@0.5.10
-└── truffle@5.0.24
+---
+## ¿Cómo instalar y ejecutar en local?
 
+Para poder ejecutar en local es necesario realizar los siguientes pasos:
 
-## Casos de uso
-...
+1) Clonar el repositorio desde GitHub:
 
+    $ _git clone https://github.com/lealp22/DYDII_PEC1.git_
+
+2) Entrar al siguiente directorio e instalar dependencias:
+
+    $ _cd DYDII_PEC1/app_
+    $ _npm install_
+
+3) Ejecutar Truffle:
+
+    $ _npx truffle develop_
+
+    (En este punto también se podría utilizar _Ganache_, siempre que apunte a la dirección http://127.0.0.1:9545)
+
+4) Abrimos un nuevo terminal y desde el mismo directorio (DYDII_PEC1/app) ejecutamos:
+
+    $ _npx ethereum-bridge -a 9 -H 127.0.0.1 -p 9545 --dev_
+
+    Con este paso se ejecuta el servicio _ethereum-bridge_, necesario para que el oráculo de la Dapp funciones en local
+
+    ![Ethereum bridge](./images/ethereum-bridge.jpg)
+
+5) Compilar los Smart Contracts:
+
+    Desde Truffle: > _compile_
+    Desde la línea de comandos (para _Ganache_): $ _truffle compile_
+
+6) Migrar los Smart Contracts:
+
+    Desde Truffle: > _migrate_
+    Desde la línea de comandos (para _Ganache_): $ _truffle migrate_
+
+7) Ejecutamos el test unitario para comprobar el correcto funcionamiento:
+
+    Desde Truffle: > _test_
+    Desde la línea de comandos (para _Ganache_): $ _truffle test_    
+
+8) Abrimos un nuevo terminal y, una vez ethereum-bridge esté escuchando, ejecutamos (desde el mismo directorio que en los pasos anteriores --DYDII_PEC1/app--):
+
+    $ _npm run dev_
+
+    ![Comando finalizado](./images/run_dev.jpg)
+
+9) Completado el paso anterior, ya podemos ejecutar la Dapp desde nuestro navegador con la siguiente url:
+
+    [http://localhost:8080](http://localhost:8080)
+
+Se aconseja importar la primera clave privada de la lista a Metamask, de esta forma se podrá utilizar las funcionalidades disponibles solo para el _Owner_.
+
+![Truffle accounts](./images/truffle-accounts.jpg)
+
+---
 ## ¿Cómo utilizar la Dapp?
 ...
 
-## Pruebas
-...
+
 
 ---
 # Puntos evaluables
