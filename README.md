@@ -24,15 +24,61 @@ estuviese registrado en el sistema, se asignaría una cantidad de tokens estable
 una tarifa definida para dicho envase. En caso de no estar registrado, se asignaría un
 token por cada unidad recolectada.
 
-![./images/Recycler3.jpg](./images/Recycler3.jpg)
+![./images/Recycler3.jpg](./images/Recycler3.jpg)  
 [Fuente: 20minutos.es](https://blogs.20minutos.es/capeando-la-crisis/2018/02/07/maquinas-que-dan-dinero-por-reciclar-botellas-de-plastico-las-queremos-en-espana/)  
 
 ---
-## Estructura
-...
+## Funcionamiento
 
-## ¿Cómo instalar y configurar?
-...
+La página web de la aplicación lucirá de forma similar:
+
+![Screenshot_1.jpg](./images/Screenshot_1.jpg)
+![Screenshot_2.jpg](./images/Screenshot_2.jpg)
+![Screenshot_3.jpg](./images/Screenshot_3.jpg)
+
+Contando con los siguientes elementos:
+
+Lateral derecho: 
+----------------
+Muestra información sobre la cuenta con la que se está trabajando en el momento e información sobre elementos del entorno.
+
+Este se compone de:
+
+- **Estado**: muestra la última acción relevante realizada por la Dapp en relación a la cuenta que se está utilizando.
+
+- **Cuenta**: Dirección de la cuenta con la se está trabajando 
+
+- **Saldo tokens:** Saldo asignado a la cuenta (en términos de tokens).
+
+- **Red**: Id de la red sobre la que se está trabajando.
+
+- **Log**: Cuadro de texto en el que se van acumulando los mensaje
+
+
+
+
+## ¿Cómo instalar y configurar en local?
+
+1) Fire up your favourite console & clone this repo somewhere:
+
+❍ git clone https://github.com/provable-things/ethereum-examples.git
+
+2) Enter this directory & install dependencies:
+
+❍ cd ethereum-examples/solidity/truffle-examples/diesel-price && npm install
+
+3) Launch Truffle:
+
+❍ npx truffle develop
+
+4) Open a new console in the same directory & spool up the ethereum-bridge:
+
+❍ npx ethereum-bridge -a 9 -H 127.0.0.1 -p 9545 --dev
+
+5) Once the bridge is ready & listening, go back to the first console with Truffle running & set the tests going!
+
+❍ truffle(develop)> test
+
 
 ### Versiones programas instalados
 
@@ -200,39 +246,39 @@ Se valida que:
   
 **- Test "Generación de eventos"**
 
-?????????????????????????????????
-     
-Se realiza una transferencia de 7 tokens a una nueva cuenta
+Se realiza una transferencia de 7 tokens a una nueva cuenta para verificar que se generen
+todos los eventos esperados:
      
 Se valida que:
-- Se ejecuta el evento newUser
-- Se ejecuta el evento newBalance
-- Se ejecuta el evento coinSent
+- Se ejecuta el evento newUser (alta usuario)
+- Se ejecuta el evento newBalance (actualización saldo de tokens)
+- Se ejecuta el evento coinSent (transacción realizada)
 - Que los valores enviados en el evento cointSent coinciden con los de la transferencia
        
   
-**- Test "LLama a una función de Pausable.sol para comprobar la herencia" 
+**- Test "LLama a una función de Pausable.sol para comprobar la herencia"**
      
-LLama a una función de Pausable.sol para comprobar que esté disponible
+LLama a una función de Pausable.sol para comprobar que esta disponible y se puede ejecutar.
      
 
-**- Test "Activar y desactivar la pausa (circuit break) de la Dapp"
+**- Test "Activar y desactivar la pausa (circuit break) de la Dapp"**
      
-Activa y desactiva los estados que implementan el "circuit break" de la Dapp
+En este test se activa y desactiva los estados (Pause/Unpause) con los que se implementa el "circuit break" de la Dapp.
      
 Se valida:
-- El estado de la Dapp tras ejecutar la acciones de Pause Unpause
+- El estado de la Dapp tras ejecutar cada una de las acciones (Pause y Unpause)
 - Se emiten los eventos correspondientes
      
   
-**- Test "LLama a una función de Ownable.sol para comprobar la herencia"   
+**- Test "LLama a una función de Ownable.sol para comprobar la herencia"**  
      
-LLama a una función de Ownable.sol para comprobar que esté disponible
+LLama a una función de Ownable.sol para comprobar que esté disponible y se puede ejecutar.
      
 
-**- Test "Enviar y recibir Ethers"
+**- Test "Enviar y recibir Ethers"**
      
-Test de funciones para manejar el saldo en Ethers del contrato
+Aquí se prueban las funciones disponibles para manejar el saldo en Ethers del contrato.
+Por un lado el envío de Ethers desde una cuenta al contrato y por otro el retiro de los fondos para transferirlos al owner.
      
 Para ello:
 - Se traspasan weis al contrato
@@ -242,11 +288,23 @@ Para ello:
 Se valida que el saldo inicial y final son iguales, mientras que el intermedio es superior
      
   
-**- Test "Se detiene el contrato (Pause) y se intenta enviar tokens"
+**- Test "Se detiene el contrato (Pause) y se intenta enviar tokens"**
      
 Se detiene el contrato (Pause) para activar el "circuit break" y se valida que no se pueden realizarse transacciones
 
-- No se ha podido probar el correcto funcionamiento del oráculo al no estar 
+Se comprueba que:
+- Cambia el estado del contrato (a paused)
+- Se emite el evento Paused()
+- Se produce un error al intentar realizar la transferencia
+
+
+**Observaciones:**
+
+- No se ha podido automatizar el test para comprobar el correcto funcionamiento del
+  oráculo. Al haber un callback y necesitar de la utilización de ethereum-bridge
+  se ha descartado el test por la complejidad que requería. Sin embargo, sí que se ha probado que funciona en local correctamente desde el Front.
+
+![Test utilizando el oráculo](./images/Screenshot_test_oraculo_local.jpg)
 
 
 ## TESTING - Todos los test se ejecutan satisfactoriamente.

@@ -246,7 +246,7 @@ contract("Recycler", accounts => {
         from: accounts[0] 
       });
       steps += 1;
-      assert.fail("No es posible realizar transacciones");
+      assert.fail("La transacción se ha podido realizar");
     } catch (error) {
       steps += 1;
       assert.equal(steps, 1, "Debe producirse un error");

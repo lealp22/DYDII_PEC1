@@ -14,6 +14,7 @@ const App = {
   eventSet1: null,
   eventSet2: null,
   eventSet3: null,
+  eventSet4: null,  
   owner: null,
   paused: false,
 
@@ -54,6 +55,7 @@ const App = {
           this.eventSet1 = new Set();
           this.eventSet2 = new Set();
           this.eventSet3 = new Set();
+          this.eventSet4 = new Set();
           await this.getOwner();
           await this.getPaused();
 
@@ -195,6 +197,28 @@ const App = {
     }.bind(this));    
 
     //* 
+    //* Tratamiento evento LogPriceUpdated
+    //*
+    let eventLogPriceUpdated = this.meta.events.LogPriceUpdated({ filter: {_sender: this.address}}, function(error, event){ 
+
+        console.log("Error LogPriceUpdated: ", error);
+        console.log("Event LogPriceUpdated: ", event);
+
+        if (!error) {
+
+            console.log("LogPriceUpdated hash: ", event.transactionHash);
+            console.log("LogPriceUpdated _result: ", event.returnValues._result);
+            console.log("LogPriceUpdated eventSet4: ", this.eventSet4);
+
+            if (!this.eventSet4.has(event.transactionHash)) {
+
+                this.eventSet4.add(event.transactionHash);
+                showMessage("Evento LogPriceUpdated. Se ha recibido respuesta del oráculo.");
+            }
+        }      
+    }.bind(this));     
+
+    //* 
     //* Tratamiento evento Paused
     //*
     let eventPause = this.meta.events.Paused({ filter: {_sender: this.address}}, function(error, event){ 
@@ -293,8 +317,6 @@ const App = {
             }
         });
 
-        //this.setStatus("Transacción completada");
-        //this.refreshBalance();
         this.initializeInput();
 
       } else {
@@ -310,7 +332,7 @@ const App = {
   initializeInput: async function() {
 
     console.log("entrando initializeInput");
-
+/* 
     const codebar = document.getElementById("codebar");
     const description = document.getElementById("description");   
     const quantity = document.getElementById("quantity");
@@ -322,7 +344,12 @@ const App = {
     quantity.value = 1;
     measure.value = "UNI";
     amount.value = 1;
-    
+ */
+    document.getElementById("codebar").value = "";
+    document.getElementById("description").value = "";   
+    document.getElementById("quantity").value = 1;
+    document.getElementById("measure").value = "UNI";
+    document.getElementById("amount").value = 1;    
   },
 
   //*
@@ -693,7 +720,7 @@ const App = {
     console.log("Uni: ", _mvt[3]);
 
     table.rows[1].cells[0].innerHTML = _mvt[0];
-    table.rows[1].cells[1].innerHTML = _mvt[1] + " unknown";
+    table.rows[1].cells[1].innerHTML = isEmpty(_mvt[1]) ? "unknown":"Tarifa " + _mvt[1];
     table.rows[1].cells[2].innerHTML = _mvt[2];
     table.rows[1].cells[3].innerHTML = (_mvt[3] == "KGM") ? "Kilos":"Unidades";
     table.rows[1].cells[4].innerHTML = _mvt[4];
@@ -780,6 +807,7 @@ window.addEventListener("load", function() {
         if (event.selectedAddress.toLowerCase() != App.account.toLowerCase()) {
 
             document.getElementById("eventsLog").innerHTML = "";
+            App.initializeInput();
             App.start();
         }
 
