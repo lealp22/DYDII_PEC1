@@ -2,6 +2,8 @@ import Web3 from "web3";
 //import recyclerArtifact from "../../build/contracts/Recycler.json";
 import recyclerArtifact from "../dist/contracts/Recycler.json";
 
+const SECRETS = require('./secrets');
+
 const App = {
   web3: null,
   account: null,
@@ -28,6 +30,7 @@ const App = {
       console.log("** start **");
       console.log("This: ", this);
       console.log("Web3: ", web3);
+      console.log("Secret: ", SECRETS);
 
       try {
           // get contract instance
@@ -384,12 +387,14 @@ const App = {
       const description = document.getElementById("description");
       const prefix = 'https://api.mlab.com/api/1/databases/productos/collections/';
       const apiKey1 = '"}&apiKey='
-      const apiKey2 = '1KuXCnUSqfOGDAoKSZHENTSFBBlu4d6n';
+      //const apiKey2 = '1KuXCnUSqfOGDAoKSZHENTSFBBlu4d6n';
+      const apiKey2 = SECRETS.MLAB.APIKEY;
 
       //this.prodPrice = 1;
       //this.prodFee = "";      
 
       console.log("Buscando codigo: ", this.prodCode);
+      console.log("Apikey: ", apiKey2);
 
       if (!isEmpty(this.prodCode)) {
 
@@ -807,6 +812,7 @@ window.addEventListener("load", function() {
         if (event.selectedAddress.toLowerCase() != App.account.toLowerCase()) {
 
             document.getElementById("eventsLog").innerHTML = "";
+            showMessage("Detectada nueva cuenta. Se actualizan los datos");
             App.initializeInput();
             App.start();
         }

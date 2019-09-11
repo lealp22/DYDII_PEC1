@@ -10,8 +10,10 @@ En construcción...
 
 - [Acerca esta Dapp](#acerca-esta-dapp)
 - [Funcionamiento](#funcionamiento)
-- [Estructura](#estructura)
+- [Productos registrados](#productos-registrados)
+- [Estructura de la Dapp](#estructura-de-la-dapp)
 - [Entorno](#entorno)
+- [¿Cómo instalar y ejecutar en local?](#cómo-instalar-y-ejecutar-en-local)
 - [Puntos evaluables](#puntos-evaluables)
 
 ---
@@ -21,7 +23,7 @@ En construcción...
 Esta Dapp intenta simular el mecanismo con el que se le gratificaría a un usuario por la
 entrega de envases para su reciclado.
 
-Básicamente se introduciría el código de barras quu está en la etiqueta del envase y, siempre que estuviese registrado en el sistema, se asignaría una cantidad de tokens establecidos por una tarifa definida para dicho envase. En caso de no estar registrado, se asignaría un token por cada unidad recolectada.
+Básicamente se introduciría el código de barras que está en la etiqueta del envase y, siempre que estuviese registrado en el sistema, se asignaría una cantidad de tokens establecidos por una tarifa asociada a dicho envase. En caso de no estar registrado, se asignaría un token por cada unidad recolectada.
 
 ![./images/Recycler3.jpg](./images/Recycler3.jpg)  
 [Fuente: 20minutos.es](https://blogs.20minutos.es/capeando-la-crisis/2018/02/07/maquinas-que-dan-dinero-por-reciclar-botellas-de-plastico-las-queremos-en-espana/)  
@@ -33,9 +35,7 @@ Esta Dapp se ha desarrollado con webpack tomando [Metacoin](https://www.truffles
 
 La página web de la aplicación lucirá de la siguiente forma:
 
-![Screenshot_1.jpg](./images/Screenshot_1.jpg)
-![Screenshot_2.jpg](./images/Screenshot_2.jpg)
-![Screenshot_3.jpg](./images/Screenshot_3.jpg)
+![Front](./images/Front.jpg)
 
 Contando con los siguientes elementos:
 
@@ -59,7 +59,7 @@ Este se compone de:
 
 ### Panel 'Recolección':
 
-Area donde el usuario deberá introducir los datos del envase a reciclar y a partir de los cuales se asignarán en compensación un número determinado de tokens:
+Area donde el usuario deberá introducir los datos del envase a reciclar y a partir de los cuales se asignará en compensación un número determinado de tokens:
 
 Los campos son los siguientes:
 
@@ -120,7 +120,7 @@ Estos son los códigos de barra que actualmente tiene una tarifa asociada y para
 | 8410297110979 | Leche Entera Asturiana 2,2L | F0101 | 10 |
 | 8411800318950 | Trina Naranja 33cl | F0102 | 15 |
 
-La información de estos código es consultadas a través APIs genéricas provistas por [mLab](https://mlab.com).
+La información de estos código es consultadas a través de APIs genéricas provistas por [mLab](https://mlab.com).
 
 ---
 
@@ -135,6 +135,10 @@ La información de estos código es consultadas a través APIs genéricas provis
 | ./test | Scripts para test unitarios
 | ./truffle-config.js | Configuración para Truffle |
 | ./webpack.config.js | Configuración para Webpack |
+
+????????????????????????????????
+componentes
+????????????????????????????????
 
 ### Entorno
 
@@ -209,7 +213,7 @@ Para poder ejecutar en local es necesario realizar los siguientes pasos:
 
     [http://localhost:8080](http://localhost:8080)
 
-Se aconseja importar la primera clave privada de la lista a Metamask, de esta forma se podrá utilizar las funcionalidades disponibles solo para el _Owner_.
+Se aconseja importar la primera clave privada de la lista a Metamask, de esta forma se podrán utilizar las funcionalidades disponibles solo para el _Owner_.
 
 ![Truffle accounts](./images/truffle-accounts.jpg)
 
@@ -229,11 +233,9 @@ Se ha utilizado la librería **Safemath.sol** de OpenZeppelin
 Su versión original se puede encontrar en:
 [https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/math/SafeMath.sol](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/math/SafeMath.sol)
 
->Sin embargo, se ha modificado para incluir dos funciones nuevas para la suma y resta de enteros de 32 bytes (para los contadores utilizados en _Recycler.sol_)
+Sin embargo, se ha modificado para incluir dos funciones nuevas para la suma y resta de enteros de 32 bytes (para los contadores utilizados en _Recycler.sol_)
 
-
-Mencionar que esta librería no necesita ser desplegada por separado, por lo que no es necesario vincularla en el deploy de los contratos.
-Todas las funciones de _Safemath_ son _internal_, por lo que la EVM simplemente la incluye dentro del contrato.
+Mencionar que esta librería no necesita ser desplegada por separado, por lo que no es necesario vincularla en el deploy de los contratos. Todas las funciones de _Safemath_ son _internal_, por lo que la EVM simplemente la incluye dentro del contrato.
 
 ---
 ## SMART CONTRACTS - Uso de algún mecanismo como Herencia o Factory Contracts
@@ -245,7 +247,7 @@ Se han implementado ambos mecanismos:
 
 Se han utilizados los contratos de OpenZeppelin:
 
-**Pausable.sol**
+- **Pausable.sol**
 
 Su versión original se puede encontrar en:
 [https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/lifecycle/Pausable.sol](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/lifecycle/Pausable.sol)
@@ -254,7 +256,7 @@ Su versión original se puede encontrar en:
 >- Se simplifica para que el owner del contrato sea la única persona que pueda invocar las funciones _pause()_ y _unpause()_.
 >- Se incluye herencia de _Ownable.sol_ para poder implementar el cambio anterior.
 
-**Ownable.sol**
+- **Ownable.sol**
 
 Su versión original se puede encontrar en:
 [https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/ownership/Ownable.sol](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/ownership/Ownable.sol)
@@ -263,7 +265,7 @@ Su versión original se puede encontrar en:
 
 También se ha utilizado el contrato de _Provable_:
 
-**provableAPI_0.5.sol**
+- **provableAPI_0.5.sol**
 
 En este se incluye todos los contratos necesarios para trabajar con oráculos.
 
@@ -275,8 +277,8 @@ Su versión original se puede encontrar en:
 * El contrato _Pausable_ hereda de _Ownable_ 
 * El contrato _Recycler_ hereda de _Pausable_ y _usingProvable_ (en provableAPI_0.5.sol), implementando todas las funciones de estos tres contratos.
 
->_contract Pausable is Ownable_  
->_contract Recycler is usingProvable, Pausable_  
+>_contract Pausable is Ownable_  (Pausable.sol)
+>_contract Recycler is usingProvable, Pausable_  (Recycler.sol)
 
 
 ### 2) Factory Contracts
@@ -309,7 +311,15 @@ Esto es gestionado a través de los eventos **Paused()** y **Unpaused()**.
 
 ## SMART CONTRACTS - Medidas adoptadas en los contratos en cuanto a seguridad para evitar ataques típicos.
 
+- Se ha utilizado la librería _Safemath.sol_ para evitar el overflow/underflow en variables numericas.
+
+- Todas las funciones en _Recycler.sol_ llamadas por otras funciones han sido definidas como internas.
+
+????????????????????????????
+
 ## SMART CONTRACTS - Posibles patrones de actualización que usaría en el contrato (No es necesario realizar la implementación)
+
+????????????????????????????
 
 ## SMART CONTRACTS - Comentar los contratos según lo indicado en https://solidity.readthedocs.io/en/latest/layout-of-source-files.html#comments
 
@@ -444,7 +454,43 @@ Detallar procedimiento e indicar los hash
 ## EXTRAS - Utilizar ENS (no para referirse a un hash de Swarm)
 Detallar procediiento y funcionamiento / caso de uso del ENS en la aplicación
 
+---
 ## EXTRAS - Uso de oráculos
-Detallar procedimiento realizado, añadir guía para el lanzamiento del oráculo y dejar claro su funcionamiento
 
+En la Dapp se utiliza un oráculo para recuperar el número de tokens que deben ser asignados a un usuario a cambio de la entrega de envases para su reciclado.
 
+El oráculo implementado es el de _Provable_ (antiguo Oraclize). Para ello ha sido necesario incluir en nuestro contrato princial _Recycler_ (Recycler.sol) la importación de:
+
+> import "./provableAPI_0.5.sol"
+
+> (Este fuente inluye los contratos usingProvable, solcChecker, ProvableI, OracleAddrResolverI, y las librerías Buffer, CBOR )
+
+E incluimos la herencia de los métodos de usingProvable en nuestro contrato:
+
+> contract Recycler is **usingProvable**, Pausable {
+
+La utilización del oráculo dentro de nuestro contrato se realiza con las funciones _fetchPrice()_ y _\_\_callback()_. En la primera de ellas se envía la query al oráculo y la segunda es ejecutada con el 'callback' a nuestro contrato para devolver el resultado obtenido por el oráculo.
+
+**Función fetchPrice(_fee)**
+
+Con el valor de la tarifa que recibamos (_fee) construimos la query:
+
+> string memory _url = string(abi.encodePacked("[URL] ['json(https://api.mlab.com/api/1/databases/productos/collections/fees?apiKey=${[decrypt] BPssDAFd3BExbW4l0ee1RNV45pvdhOita1bwVtTzVu7aRvHoFZhuNCuuZnC8wzm6GUQ3yTz18+B2vnoADbHHpRc9NcMb/YZOwXo0sJsM5paIGll6oYEqpjWMQQ3eEISzGkE0/JMIHiDyG1SpiYI3bYg=}).0.result.", _fee, ".price']"));
+
+Enviamos la query y guardamos el Id (_queryId_) para cuando recibamos la respuesta:
+
+> bytes32 queryId = provable_query("nested", _url, 350000);
+
+Aquí se emite el evento _LogNewProvableQuery(message)_.
+
+Mencionar que la Apikey de la Api utilizada ha sido cifrada con la clave pública de Provable a través de su servicio de ['Test query'](http://app.provable.xyz/home/test_query).
+
+**Función __callback(id, result)**
+
+Una vez el oráculo obtiene los datos, hace el 'callback' a nuestro contrato indicando el Id de la query para la que devuelve el resultado.
+
+A partir de allí se continua con el flujo del proceso recogiendo los datos guardados asociados al Id y tratando el resultado. En concreto, se completa la información de la transacción multiplicando el resultado de la query por el número de unidades recicladas.
+
+Aquí se emite el evento _LogPriceUpdated(result)_
+
+> Observaciones: Es importante que el contrato disponga de saldo suficiente para poder pagar el gas necesario para el envío del _\_\_callback()_.
