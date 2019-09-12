@@ -11,6 +11,7 @@ En construcción...
 - [Acerca esta Dapp](#acerca-esta-dapp)
 - [Funcionamiento](#funcionamiento)
 - [Productos registrados](#productos-registrados)
+- [¿Cómo utilizar la Dapp?](#como-utilizar-la-dapp)
 - [Estructura de la Dapp](#estructura-de-la-dapp)
 - [Entorno](#entorno)
 - [¿Cómo instalar y ejecutar en local?](#cómo-instalar-y-ejecutar-en-local)
@@ -81,15 +82,15 @@ Los campos son los siguientes:
 
 En esta área se muestran las últimas 5 transacciones realizadas con la cuenta con que se está trabajando.
 
-Los campos de la tablas corresponden a los campos introducidos en el panel de _'Recolección'_.
-
-Bajo esta tabla se muestra el número total de transacciones de la cuenta.
+Los campos de la tabla de movimientos corresponde a los campos introducidos en el panel de _'Recolección'_.
 
 ![Últimas recolecciones](./images/ultimas_recolecciones.jpg)
 
-_Observación_: 
-- La cuenta del _owner_ siempre tendrá una primera transacción con el código 'coinbase' que justifica los 10.000 tokens que le son entregados con el despliegue del contrato.
-- Actualmente se muestra en la columna _'Descripción'_ la tarifa que se haya utilizado para calcular los tokens. Esto se utiliza así para poder comprobar el valor devuelto por el oráculo.
+Bajo esta tabla se muestra el número total de transacciones de la cuenta.
+
+>_Observación_: 
+>- La cuenta del _owner_ siempre tendrá una primera transacción con el código 'coinbase' que justifica los 10.000 tokens que le son entregados con el despliegue del contrato.
+>- Actualmente se muestra en la columna _'Descripción'_ la tarifa que se haya utilizado para calcular los tokens. Esto se utiliza así para poder comprobar el valor devuelto por el oráculo.
 
 ### Panel 'Información del Sistema':
 
@@ -120,7 +121,37 @@ Estos son los códigos de barra que actualmente tiene una tarifa asociada y para
 | 8410297110979 | Leche Entera Asturiana 2,2L | F0101 | 10 |
 | 8411800318950 | Trina Naranja 33cl | F0102 | 15 |
 
-La información de estos código es consultadas a través de APIs genéricas provistas por [mLab](https://mlab.com).
+La información de estos códigos es consultada a través de APIs genéricas provistas por [mLab](https://mlab.com).
+
+---
+## ¿Cómo utilizar la Dapp?
+
+Para realizar una transacción tan solo será necesario introducir los datos en el panel de "Recolección".
+
+**1º)** Se deberá introducir el código de barra del envase a reciclar. 
+    - Si el código estuviese registrado en el sistema (ver lista [productos registrados](#productos-reistrados)), se mostrará la descripción y se calculará el número total de tokens que se entregarán.
+    - Si no, se mostrará el texto "unkown" en la descripción y se entregará un token por cada unidad entregada.
+
+**2º)** Se introduce el número de envases a reciclar.
+
+**3º)** Se selecciona la unidad de medida: Unidades o Kilos.
+
+**4º)** Haga click sobre el botón \[Enviar] (Este botón se habilita al introducir un código).
+
+**5º)** Aceptar la transacción con Metamask.
+
+**6º)** Aparecerá un mensaje de confirmación indicando los tokens entregados y el hash de la transacción.
+
+![Confirmación](./images/confirmacion.jpg)
+
+> _Observación_: Si se utiliza el código de un [producto registrado](#productos-reistrados) se deberá esperar la respuesta del oráculo, por lo que la confirmación del paso 6 podrá tardar unos segundos. Se ruega paciencia.
+
+![Breve demostración](./images/funcionamiento-optimize.gif)
+
+**Si el usuario es el owner**, también podrá activar el _circuit-break_ a través del botón \[Pause] que aparece en el panel de ["Información del Sistema"](#panel-información-del-sistema). Si por el contrario, este ya estuviese activado, el botón aparecerá con la etiqueta _"Unpause".
+
+Ver implementación de [parada de emergencia](#smart-contracts---implementar-una-parada-de-emergencia-en-el-contrato-circuit-breaker--emergency-stop).
+
 
 ---
 
@@ -176,7 +207,7 @@ Para poder ejecutar en local es necesario realizar los siguientes pasos:
 
 3) Ejecutar Truffle:
 
-    $ _npx truffle develop_
+    $ _truffle develop_
 
     (En este punto también se podría utilizar _Ganache_, siempre que apunte a la dirección http://127.0.0.1:9545)
 
@@ -186,7 +217,7 @@ Para poder ejecutar en local es necesario realizar los siguientes pasos:
 
     Con este paso se ejecuta el servicio _ethereum-bridge_, necesario para que el oráculo de la Dapp funciones en local
 
-    ![Ethereum bridge](./images/ethereum-bridge.jpg)
+    ![Ethereum bridge](./images/ethereum-bridge.jpg)g
 
 5) Compilar los Smart Contracts:
 
@@ -213,18 +244,27 @@ Para poder ejecutar en local es necesario realizar los siguientes pasos:
 
     [http://localhost:8080](http://localhost:8080)
 
-Se aconseja importar la primera clave privada de la lista a Metamask, de esta forma se podrán utilizar las funcionalidades disponibles solo para el _Owner_.
+> _Observación:_ Se aconseja importar la primera clave privada de la lista de cuentas a Metamask. De esta forma se podrá utilizar las funcionalidades disponibles unicamente para el _Owner_.
 
 ![Truffle accounts](./images/truffle-accounts.jpg)
 
 ---
-## ¿Cómo utilizar la Dapp?
-...
 
+# Puntos evaluables
 
+## INTERFAZ
+
+| Tareas | Observaciones |
+|--------|---------------|
+| Ejecución de la aplicación en un servidor local (localhost) | Ver [¿Cómo instalar y ejecutar en local?](#cómo-instalar-y-ejecutar-en-local) |
+| Visitar desde el navegador la URL correspondiente y que se realice una carga correcta de la aplicación | Ver [¿Cómo instalar y ejecutar en local?](#cómo-instalar-y-ejecutar-en-local) (Paso 9) |
+| Interactuar con la aplicación (botones, formularios...) | Ver [¿Cómo utilizar la Dapp?](#como-utilizar-la-dapp) |
+| Mostrar el address actual (en función del proveedor: MetaMask...) | Ver recuadro "Cuenta" en [panel lateral izquierdo](#panel-lateral-izquierdo) |
+| Refrescar automáticamente la web en caso de cambiar de address (MetaMask) | En el fuente _index.js_ se ha incluido la siguiente instrucción que permite detectar un cambio de address: _App.web3.currentProvider.publicConfigStore.on(**"update"**, async function(event){...}_
+| Firmar transacciones usando MetaMask. | Ver [¿Cómo utilizar la Dapp?](#como-utilizar-la-dapp) (Paso 5) |
+| Guiar al usuario final que usa la aplicación sobre lo que está sucediendo en la aplicación | Ver recuadro "Estado" y "Log" en [panel lateral izquierdo](#panel-lateral-izquierdo) |
 
 ---
-# Puntos evaluables
 
 ## LIBRERIA - Utilizar una librería existente de OpenZeppelin o EthPM
 
@@ -274,11 +314,11 @@ Su versión original se puede encontrar en:
 
 
 **En resumen:**
-* El contrato _Pausable_ hereda de _Ownable_ 
+* El contrato _Pausable_ hereda de _Ownable_  
 * El contrato _Recycler_ hereda de _Pausable_ y _usingProvable_ (en provableAPI_0.5.sol), implementando todas las funciones de estos tres contratos.
 
->_contract Pausable is Ownable_  (Pausable.sol)
->_contract Recycler is usingProvable, Pausable_  (Recycler.sol)
+>_contract Pausable is Ownable_  (Pausable.sol)  
+>_contract Recycler is usingProvable, Pausable_  (Recycler.sol)  
 
 
 ### 2) Factory Contracts
@@ -309,6 +349,7 @@ Esta implementación se ha hecho a través de un botón de **"Pause"** que apare
 
 Esto es gestionado a través de los eventos **Paused()** y **Unpaused()**.
 
+---
 ## SMART CONTRACTS - Medidas adoptadas en los contratos en cuanto a seguridad para evitar ataques típicos.
 
 - Se ha utilizado la librería _Safemath.sol_ para evitar el overflow/underflow en variables numericas.
@@ -317,9 +358,13 @@ Esto es gestionado a través de los eventos **Paused()** y **Unpaused()**.
 
 ????????????????????????????
 
+---
+
 ## SMART CONTRACTS - Posibles patrones de actualización que usaría en el contrato (No es necesario realizar la implementación)
 
 ????????????????????????????
+
+---
 
 ## SMART CONTRACTS - Comentar los contratos según lo indicado en https://solidity.readthedocs.io/en/latest/layout-of-source-files.html#comments
 
@@ -427,19 +472,19 @@ Se comprueba que:
 **Observaciones:**
 
 - No se ha podido automatizar el test para comprobar el correcto funcionamiento del
-  oráculo. Al haber un callback y necesitar de la utilización de ethereum-bridge
-  se ha descartado el test por la complejidad que requería. Sin embargo, sí que se ha probado que funciona en local correctamente desde el Front.
+  oráculo. Al haber un callback y necesitar de la utilización del _ethereum-bridge_
+  se ha descartado el test por la complejidad que requería. Sin embargo, sí que se ha probado que funciona correctamente en local desde el Front.
 
 ![Test utilizando el oráculo](./images/Screenshot_test_oraculo_local.jpg)
 
-
+---
 ## TESTING - Todos los test se ejecutan satisfactoriamente.
 
 Todos los test se ejecutan satisfactoriamente:
 
 ![Resultado test](./images/Screenshot_test.jpg)
 
-
+---
 ## TESTING - Realizar comentarios sobre el código de los tests.
 
 Todos los tests han sido comentados dentro de test/recycler.js
@@ -448,9 +493,15 @@ Todos los tests han sido comentados dentro de test/recycler.js
 ## EXTRAS - Alojar el/los contrato/s en una testnet y verificar el código
 Detallar procedimiento e indicar las direcciones
 
+???????????????????????????
+
+---
 ## EXTRAS - Alojar la aplicación en IPFS / Swarm
 Detallar procedimiento e indicar los hash
 
+???????????????????????????
+
+---
 ## EXTRAS - Utilizar ENS (no para referirse a un hash de Swarm)
 Detallar procediiento y funcionamiento / caso de uso del ENS en la aplicación
 
@@ -481,7 +532,7 @@ Enviamos la query y guardamos el Id (_queryId_) para cuando recibamos la respues
 
 > bytes32 queryId = provable_query("nested", _url, 350000);
 
-Aquí se emite el evento _LogNewProvableQuery(message)_.
+Emite el evento _LogNewProvableQuery(message)_, donde _message_ indica si se envío la query o, por el contrario, el contrato no disponía de saldo suficiente.
 
 Mencionar que la Apikey de la Api utilizada ha sido cifrada con la clave pública de Provable a través de su servicio de ['Test query'](http://app.provable.xyz/home/test_query).
 
@@ -491,6 +542,6 @@ Una vez el oráculo obtiene los datos, hace el 'callback' a nuestro contrato ind
 
 A partir de allí se continua con el flujo del proceso recogiendo los datos guardados asociados al Id y tratando el resultado. En concreto, se completa la información de la transacción multiplicando el resultado de la query por el número de unidades recicladas.
 
-Aquí se emite el evento _LogPriceUpdated(result)_
+Emite el evento _LogPriceUpdated(result)_, donde _result_ es la respuesta devuelta por el oráculo.
 
-> Observaciones: Es importante que el contrato disponga de saldo suficiente para poder pagar el gas necesario para el envío del _\_\_callback()_.
+**Observaciones:** Es importante que el contrato disponga de saldo suficiente para poder pagar el gas necesario para el envío del _\_\_callback()_. Es por ello que en el fichero para la migración _2\_deploy\_contracts.js_ se incluye el parámetro **value**, para dotar al contrato con un saldo inicial de 1 Ether.

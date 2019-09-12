@@ -124,10 +124,6 @@
             <div role="alert" class="alert alert-success">
                 <h6 class="alert-heading">Estado:</h6>
                 <span id="status">Cargando...</span>
-                <!----
-                <div class="spinner-border spinner-border-sm" role="status">
-                    <span class="sr-only">Loading...</span>
-                </div> -->
             </div>
 
             <div class="card bg-faded border-1 mb-3">
@@ -153,13 +149,6 @@
                     <h6 class="card-title">Log:</h6>
                     <textarea readonly class="w-100 event-log" id="eventsLog"></textarea>
                 </div>
-                <!--
-                <div>
-                    <p class="center-align">
-                        Tokens en circulación: <b><span id="globalBalance">unknown</span></b>
-                    </p>
-                </div>
-                -->
             </div>
 
             <footer class="footer center-align">
@@ -327,20 +316,11 @@
                             <td class="w-60 right-align"><b><span id="paused">unknown</span></td>
                         </tr>
                     </table>
-                    <!--
-                    <p class="center-align">
-                        Tokens en circulación: <b><span id="globalBalance">unknown</span></b><br>
-                        Usuarios totales.....: <b><span id="globalUsers">unknown</span></b>
-                    </p>
-                    -->
                 </div>
                 <div class="padding-mi">
                     <button id="pauseButton" onclick="App.pause()" class="btn btn-primary btn-lg btn-block btn-mi m-auto" disabled>Pause</button>
                 </div>
             </div>
-
             <script src="index.js"></script>
-
 </body>
-
 </html>
