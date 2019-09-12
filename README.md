@@ -128,8 +128,8 @@ La información de estos códigos es consultada a través de APIs genéricas pro
 
 Para realizar una transacción tan solo será necesario introducir los datos en el panel de "Recolección".
 
-**1º)** Se deberá introducir el código de barra del envase a reciclar. 
-    - Si el código estuviese registrado en el sistema (ver lista [productos registrados](#productos-reistrados)), se mostrará la descripción y se calculará el número total de tokens que se entregarán.
+**1º)** Se deberá introducir el código de barra del envase a reciclar.  
+    - Si el código estuviese registrado en el sistema (ver lista [productos registrados](#productos-reistrados)), se mostrará la descripción y se calculará el número total de tokens que se entregarán.  
     - Si no, se mostrará el texto "unkown" en la descripción y se entregará un token por cada unidad entregada.
 
 **2º)** Se introduce el número de envases a reciclar.
@@ -144,13 +144,13 @@ Para realizar una transacción tan solo será necesario introducir los datos en 
 
 ![Confirmación](./images/confirmacion.jpg)
 
-> _Observación_: Si se utiliza el código de un [producto registrado](#productos-reistrados) se deberá esperar la respuesta del oráculo, por lo que la confirmación del paso 6 podrá tardar unos segundos. Se ruega paciencia.
+> **Observación**: Si se utiliza el código de un [producto registrado](#productos-reistrados) se deberá esperar la respuesta del oráculo, por lo que la confirmación del paso 6 podrá tardar unos segundos. Se ruega paciencia.
 
 ![Breve demostración](./images/funcionamiento-optimize.gif)
 
-**Si el usuario es el owner**, también podrá activar el _circuit-break_ a través del botón \[Pause] que aparece en el panel de ["Información del Sistema"](#panel-información-del-sistema). Si por el contrario, este ya estuviese activado, el botón aparecerá con la etiqueta _"Unpause".
+**Si el usuario es el owner**, también podrá activar el _circuit-break_ a través del botón \[Pause] que aparece en el panel de ["Información del Sistema"](#panel-información-del-sistema). Si por el contrario, este ya estuviese activado, el botón aparecerá con la etiqueta _"Unpause"_.
 
-Ver implementación de [parada de emergencia](#smart-contracts---implementar-una-parada-de-emergencia-en-el-contrato-circuit-breaker--emergency-stop).
+Para más detalles, ver implementación de [parada de emergencia](#smart-contracts---implementar-una-parada-de-emergencia-en-el-contrato-circuit-breaker--emergency-stop).
 
 
 ---
@@ -179,6 +179,7 @@ Se requiere tener instalado en el entorno el siguiente software:
 - Npm
 - Node.js
 - Truffle
+- Web3
 - Metamask
 - Ganache (opcional)
 
@@ -188,6 +189,7 @@ Las versiones instalas al probar esta Dapp eran las siguientes:
 - Node v8.10.0  
 - Solc v0.5.10
 - Npm v6.9.0
+- Web3 v1.0.0
 - Ganacle-cli@6.4.4
 - MetaMask v7.1.1
 

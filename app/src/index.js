@@ -1,6 +1,6 @@
 import Web3 from "web3";
 //import recyclerArtifact from "../../build/contracts/Recycler.json";
-import recyclerArtifact from "../dist/contracts/Recycler.json";
+import recyclerArtifact from "../Recycler.json";
 
 const SECRETS = require('./secrets');
 
@@ -645,6 +645,8 @@ function showMessage(_message) {
     eventsLog.textContent = "> " + _message + "\n" + eventsLog.textContent;
 };
 
+let indAlert = 0;
+
 window.App = App;
 
 window.addEventListener("load", function() {
@@ -660,7 +662,10 @@ window.addEventListener("load", function() {
             
         if (typeof event.selectedAddress === "undefined") {
 
-            alert("Es imprescindible tener Metamask conectado para poder utilizar la aplicación");
+            if (indAlert == 0) {
+                alert("Es imprescindible tener Metamask conectado para poder utilizar la aplicación");
+            }
+            indAlert = (indAlert + 1) % 5;
 
         } else {
 
