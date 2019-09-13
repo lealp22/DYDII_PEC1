@@ -36,7 +36,7 @@ module.exports = {
    */
 
   //contracts_build_directory: "./app/dist/contracts",
-  contracts_build_directory: "./build/contracts",
+  //contracts_build_directory: "./build/contracts",
 
   networks: {
     // Useful for testing. The `development` name is special - truffle uses it by default
@@ -62,7 +62,7 @@ module.exports = {
       port: 8545,
       from: "0xeb427055ac4a192cd18d49c208903aa5c00ccd19", // default address to use for any transaction Truffle makes during migrations
       network_id: 4,
-      gas: 7000000 // Gas limit used for deploys
+      gas: 6500000 // Gas limit used for deploys
     },
 
     // Another network with more advanced options...

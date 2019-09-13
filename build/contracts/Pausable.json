@@ -1776,7 +1776,7 @@
   },
   "networks": {},
   "schemaVersion": "3.0.11",
-  "updatedAt": "2019-09-12T18:52:50.645Z",
+  "updatedAt": "2019-09-12T23:29:58.775Z",
   "devdoc": {
     "details": "Contract module which allows children to implement an emergency stop mechanism that can be triggered by the contract owner. * This module is used through inheritance. It will make available the modifiers `whenNotPaused` and `whenPaused`, which can be applied to the functions of your contract. Note that they will not be pausable by simply including this module, only once the modifiers are put in place.",
     "methods": {

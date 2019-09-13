@@ -126,6 +126,8 @@ La información de estos códigos es consultada a través de APIs genéricas pro
 ---
 ## ¿Cómo utilizar la Dapp?
 
+![Breve demostración](./images/funcionamiento-optimize.gif)
+
 Para realizar una transacción tan solo será necesario introducir los datos en el panel de "Recolección".
 
 **1º)** Se deberá introducir el código de barra del envase a reciclar.  
@@ -146,8 +148,6 @@ Para realizar una transacción tan solo será necesario introducir los datos en 
 
 > **Observación**: Si se utiliza el código de un [producto registrado](#productos-reistrados) se deberá esperar la respuesta del oráculo, por lo que la confirmación del paso 6 podrá tardar unos segundos. Se ruega paciencia.
 
-![Breve demostración](./images/funcionamiento-optimize.gif)
-
 **Si el usuario es el owner**, también podrá activar el _circuit-break_ a través del botón \[Pause] que aparece en el panel de ["Información del Sistema"](#panel-información-del-sistema). Si por el contrario, este ya estuviese activado, el botón aparecerá con la etiqueta _"Unpause"_.
 
 Para más detalles, ver implementación de [parada de emergencia](#smart-contracts---implementar-una-parada-de-emergencia-en-el-contrato-circuit-breaker--emergency-stop).
@@ -166,6 +166,26 @@ Para más detalles, ver implementación de [parada de emergencia](#smart-contrac
 | ./test | Scripts para test unitarios
 | ./truffle-config.js | Configuración para Truffle |
 | ./webpack.config.js | Configuración para Webpack |
+
++-- app                             Archivos Javascript y plantilla HTML para nuestra Dapp
+¦   +-- dist
+¦   +-- src
+¦       +-- index.html
+¦       +-- index.js
++-- contracts                       Archivos fuentes de los Smart Contracts
+¦   +-- Recycler.sol                Smart Contracts principal de la Dapp
+¦   +-- Migrations.sol              
+¦   +-- Ownable.sol
+¦   +-- Pausable.sol
+¦   +-- provableAPI_0.5.json
+¦   +-- SafeMath.sol
++-- migrations
+¦   +-- 1_initial_migration.js
+¦   +-- 2_deploy_contracts.js
++-- test
+¦   +-- recycler.js
++-- truffle-config.js
+
 
 ????????????????????????????????
 componentes
@@ -496,6 +516,11 @@ Todos los tests han sido comentados dentro de test/recycler.js
 Detallar procedimiento e indicar las direcciones
 
 ???????????????????????????
+geth --rinkeby --rpc --rpcapi db,eth,net,web3,personal --cache=1024 --rpcport 8545 --rpcaddr 127.0.0.1 --rpccorsdomain "*"
+
+truffle migrate --network rinkeby
+
+
 
 ---
 ## EXTRAS - Alojar la aplicación en IPFS / Swarm
