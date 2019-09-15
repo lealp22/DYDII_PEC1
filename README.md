@@ -154,43 +154,38 @@ Para más detalles, ver implementación de [parada de emergencia](#smart-contrac
 
 
 ---
-
 ## Estructura de la Dapp
 
-| Directorio | Descripción |
-|------------|--------------|
-|./app   | Archivos Javascript y plantilla HTML para nuestra Dapp |
-|./build | "Artifacts" u objetos generados en la compilación de los Smart Contracts y  que se almacenan en formato JSON. Contiene información importante que la DApp puede aprovechar (por ejemplo, dirección del contrato, ABI) |
-| ./contracts  | Archivos fuentes de los Smart Contracts |
-| ./migrations | Scripts para la implementación del contrato |
-| ./test | Scripts para test unitarios
-| ./truffle-config.js | Configuración para Truffle |
-| ./webpack.config.js | Configuración para Webpack |
+La estructura de directorios y ficheros son los siguientes:
 
-+-- app                             Archivos Javascript y plantilla HTML para nuestra Dapp
-¦   +-- dist
-¦   +-- src
-¦       +-- index.html
-¦       +-- index.js
-+-- contracts                       Archivos fuentes de los Smart Contracts
-¦   +-- Recycler.sol                Smart Contracts principal de la Dapp
-¦   +-- Migrations.sol              
-¦   +-- Ownable.sol
-¦   +-- Pausable.sol
-¦   +-- provableAPI_0.5.json
-¦   +-- SafeMath.sol
-+-- migrations
-¦   +-- 1_initial_migration.js
-¦   +-- 2_deploy_contracts.js
-+-- test
-¦   +-- recycler.js
-+-- truffle-config.js
++-- app                         _Archivos Javascript y plantilla HTML para nuestra Dapp_  
+¦   +-- dist  
+¦   +-- src  
+¦       +-- index.html          +-- **Plantilla HTML para la UI de la Dapp**
+¦       +-- index.js            +-- **Codificación UI de la Dapp**
++-- build                       _"Artifacts" u objetos generados en la compilación de los Smart Contracts_  
+|   +-- contracts
++-- contracts                   _Archivos fuentes de los Smart Contracts_  
+¦   +-- Recycler.sol            +-- **Smart Contract principal de la Dapp**  
+¦   +-- Migrations.sol          +-- SC para la migración  
+¦   +-- Ownable.sol             +-- SC de OpenZeppelin para gestionar el owner de un contrato 
+¦   +-- Pausable.sol            +-- SC de OpenZeppelin para implementar paradas en contratos
+¦   +-- provableAPI_0.5.json    +-- SC de Provable para la implementación de oráculos
+¦   +-- SafeMath.sol            +-- Librería de OpenZeppelin para operaciones aritméticas
++-- migrations                  _Scripts para la implementación del contrato_  
+¦   +-- 1_initial_migration.js  +-- Despliegue de SC de migración  
+¦   +-- 2_deploy_contracts.js   +-- Despliegue del SC _Recycler_  
++-- test                        _Scripts para test unitarios_  
+¦   +-- recycler.js             +-- **Tests para el contrato Recycler**  
++-- truffle-config.js           Configuración para Truffle  
++-- webpack.config.js           Configuración para Webpack
 
+**En resumen:** 
+- La interfaz (UI) de la Dapp se ha construido con la plantilla HTML _index.html_ y la lógica codificada en el Javascript _index.js_.
+- Dentro de _Recycler.sol_ estan codificados los SC _Recycler_ y _UserFactory_. El SC principal es _Recycler_ y utiliza a _UserFactory_ para gestionar los movimientos de cada usuario (implementa la parte de _Factory Contracts_).
+- Las pruebas unitarias se han codificado en _recycler.js_.
 
-????????????????????????????????
-componentes
-????????????????????????????????
-
+---
 ### Entorno
 
 Se requiere tener instalado en el entorno el siguiente software:
@@ -347,7 +342,7 @@ Su versión original se puede encontrar en:
 
 Se ha creado el contrato **UserFactory** (en _Recycler.sol_) encargado de gestionar por separado los movimientos de tokens de cada uno de los usuarios (direcciones) que utilicen la dapp.
 
-En el contrato _Recycler_, dentro de los datos de cada usuario (struct user), se incluye el _factory contract_ (userContr) que gestionará sus movimientos:
+En el contrato _Recycler_, dentro de los datos de cada usuario (struct user), se incluye el _child contract_ (userContr) que gestionará sus movimientos:
 ````
     //* Estructura para datos de usuarios
     struct User {
@@ -513,14 +508,30 @@ Todos los tests han sido comentados dentro de test/recycler.js
 
 ---
 ## EXTRAS - Alojar el/los contrato/s en una testnet y verificar el código
-Detallar procedimiento e indicar las direcciones
 
-???????????????????????????
-geth --rinkeby --rpc --rpcapi db,eth,net,web3,personal --cache=1024 --rpcport 8545 --rpcaddr 127.0.0.1 --rpccorsdomain "*"
+Los contratos han sido alojados en la testnet de Rinkeby. Su direcciones son:
+- Migrations: [0x48D797221dBBbE43C38B657A2D96b11Ba6C6cd2e](https://rinkeby.etherscan.io/address/0x48d797221dbbbe43c38b657a2d96b11ba6c6cd2e)
+- Recycler: [0xA5DdccF4919E8AA895C8A533a184B12e93650074](https://rinkeby.etherscan.io/address/0xa5ddccf4919e8aa895c8a533a184b12e93650074)
 
-truffle migrate --network rinkeby
+Los pasos para su desplieguen han sido:
 
+1 - Ejecutar cliente Geth:
+> _\> geth --rinkeby --rpc --rpcapi db,eth,net,web3,personal --cache=1024 --rpcport 8545 --rpcaddr 127.0.0.1 --rpccorsdomain "*"_
 
+2 - Despliegue utilizando Truffle:
+> _\> truffle migrate --network rinkeby_
+
+Para verificar el código:
+
+- Calculamos el hash del "deployedBytecode" en _build/contracts/Recycler.json_ con el comando:
+> _\> web3.sha3("0x60806040526...fa417952c0029")_
+
+Obteniendo el hash:
+_"0x6cbae00ec6eb5047c94215116b9e9c2601bde910bd04d016ec64baf983a98497"_
+
+Hacemos lo mismo con el bytecode disponible en [rinkeby.etherscan.io]
+(https://rinkeby.etherscan.io/address/0xa5ddccf4919e8aa895c8a533a184b12e93650074#code), obteniendo el mismo hash:  
+_"0x6cbae00ec6eb5047c94215116b9e9c2601bde910bd04d016ec64baf983a98497"_
 
 ---
 ## EXTRAS - Alojar la aplicación en IPFS / Swarm
