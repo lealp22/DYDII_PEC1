@@ -158,27 +158,36 @@ Para más detalles, ver implementación de [parada de emergencia](#smart-contrac
 
 La estructura de directorios y ficheros son los siguientes:
 
-+-- app                         _Archivos Javascript y plantilla HTML para nuestra Dapp_  
-¦   +-- dist  
+````
++-- app                         Archivos Javascript y plantilla HTML para nuestra Dapp (UI) 
+¦   +-- package.json            Configuración NPM para UI  
+¦   +-- dist                    
 ¦   +-- src  
-¦       +-- index.html          +-- **Plantilla HTML para la UI de la Dapp**
-¦       +-- index.js            +-- **Codificación UI de la Dapp**
-+-- build                       _"Artifacts" u objetos generados en la compilación de los Smart Contracts_  
+¦       +-- index.html          +-- Plantilla HTML para la UI de la Dapp
+¦       +-- index.js            +-- Codificación UI de la Dapp
+
+¦  
++-- build                       "Artifacts" u objetos generados en la compilación de los Smart Contracts  
 |   +-- contracts
-+-- contracts                   _Archivos fuentes de los Smart Contracts_  
+¦  
++-- contracts                   Archivos fuentes de los Smart Contracts  
 ¦   +-- Recycler.sol            +-- **Smart Contract principal de la Dapp**  
 ¦   +-- Migrations.sol          +-- SC para la migración  
 ¦   +-- Ownable.sol             +-- SC de OpenZeppelin para gestionar el owner de un contrato 
 ¦   +-- Pausable.sol            +-- SC de OpenZeppelin para implementar paradas en contratos
 ¦   +-- provableAPI_0.5.json    +-- SC de Provable para la implementación de oráculos
 ¦   +-- SafeMath.sol            +-- Librería de OpenZeppelin para operaciones aritméticas
-+-- migrations                  _Scripts para la implementación del contrato_  
+¦  
++-- migrations                  Scripts para la implementación del contrato  
 ¦   +-- 1_initial_migration.js  +-- Despliegue de SC de migración  
-¦   +-- 2_deploy_contracts.js   +-- Despliegue del SC _Recycler_  
-+-- test                        _Scripts para test unitarios_  
-¦   +-- recycler.js             +-- **Tests para el contrato Recycler**  
+¦   +-- 2_deploy_contracts.js   +-- Despliegue del SC Recycler  
+¦
++-- test                        Scripts para test unitarios  
+¦   +-- recycler.js             +-- Tests para el contrato Recycler
+¦  
 +-- truffle-config.js           Configuración para Truffle  
 +-- webpack.config.js           Configuración para Webpack
+````
 
 **En resumen:** 
 - La interfaz (UI) de la Dapp se ha construido con la plantilla HTML _index.html_ y la lógica codificada en el Javascript _index.js_.
@@ -515,10 +524,10 @@ Los contratos han sido alojados en la testnet de Rinkeby. Su direcciones son:
 
 Los pasos para su desplieguen han sido:
 
-1 - Ejecutar cliente Geth:
+1. Ejecutar cliente Geth:
 > _\> geth --rinkeby --rpc --rpcapi db,eth,net,web3,personal --cache=1024 --rpcport 8545 --rpcaddr 127.0.0.1 --rpccorsdomain "*"_
 
-2 - Despliegue utilizando Truffle:
+2. Despliegue utilizando Truffle:
 > _\> truffle migrate --network rinkeby_
 
 Para verificar el código:
@@ -529,19 +538,69 @@ Para verificar el código:
 Obteniendo el hash:
 _"0x6cbae00ec6eb5047c94215116b9e9c2601bde910bd04d016ec64baf983a98497"_
 
-Hacemos lo mismo con el bytecode disponible en [rinkeby.etherscan.io]
+-Hacemos lo mismo con el bytecode disponible en [rinkeby.etherscan.io]
 (https://rinkeby.etherscan.io/address/0xa5ddccf4919e8aa895c8a533a184b12e93650074#code), obteniendo el mismo hash:  
 _"0x6cbae00ec6eb5047c94215116b9e9c2601bde910bd04d016ec64baf983a98497"_
 
 ---
 ## EXTRAS - Alojar la aplicación en IPFS / Swarm
-Detallar procedimiento e indicar los hash
 
-???????????????????????????
+Una vez ejecutado el comando _npm run build_ y con todos los componentes listos para el despliegue en el directorio _app/dist_:
+
+- Ejecutamos IPFs en nuetra máquina
+> _> ipfs daemon_
+
+- Abrimos otro terminal y ejecutamos (desde el directorio _app_):
+> _> ipfs add -r dist/_
+
+![IPF](./images/ipfs1.jpg)
+
+- Tomamos hash de la última línea, el correspondiente al directorio /dist, y ejecutamos:
+> _> ipfs name publish QmTEfzAtgjEABvwPRDJ5PZta2eTFV6pEYDDnAY2dXzH1QH_
+
+![IPF](./images/ipfs2.jpg)
+
+Para ejecutar la Dapp desde IPFS bastaría con ejecutar:
+https://ipfs.io/ipfs/QmTEfzAtgjEABvwPRDJ5PZta2eTFV6pEYDDnAY2dXzH1QH/index.html
 
 ---
 ## EXTRAS - Utilizar ENS (no para referirse a un hash de Swarm)
-Detallar procediiento y funcionamiento / caso de uso del ENS en la aplicación
+Detallar procedimiento y funcionamiento / caso de uso del ENS en la aplicación
+
+Desde el cliente geth ejecutamos el script ensutils-rinkeby.js:
+
+??????????????
+> loadScript("./ens/ensutils-rinkeby.js")
+
+Dicho script lleva las direcciones para poder funcionar sobre Rinkedy:
+
+- Línea 220: contract address: 0xe7410170f87102df0055eb195163a03b7f2bff4a
+- Línea 1314: publicResolver address: 0x5d20cf83cb385e06d2f2a892f9322cd4933eacdc
+
+Comprobamos si el dominio .test que queremos reservar está disponible (si el valor devuelto es cero):
+
+> testRegistrar.expiryTimes(web3.sha3("midomain"))
+
+Viendo está disponibel, procedemos a registrarlo:
+
+> testRegistrar.register(web3.sha3("midomain"), eth.accounts[0], {from: eth.accounts[0]})
+
+Indicamos cuál será el _Resolver_ (publicResolver) para este dominio:
+> ens.setResolver(namehash("midomain.test"), publicResolver.address, {from: eth.account
+
+Convertimos el hash de IPFS obtenido anteriormenta a Hexadecimal con la ayuda de la siguiente herramienta de codificación:
+
+https://codepen.io/phyrex/pen/MBzOGR
+
+![IPF](./images/IPFS4.jpg)
+
+0x48c264c6f2e6310c9bc08118011674a30457beb39ff99652dc9d2b808e7ae196
+
+Luego, le indicamos al Resolver cómo resolver o traducir el dominio que hemos registrado:
+> publicResolver.setAddr(namehash("midomain.test"), "0x48c264c6f2e6310c9bc08118011674a30457beb39ff99652dc9d2b808e7ae196", {from: eth.accounts[0]})
+?????????????????????????????????
+
+https://ipfs.io/ipfs/midomain.test/index.html
 
 ---
 ## EXTRAS - Uso de oráculos
