@@ -3,9 +3,6 @@
 ---
 # Dapp - Recolección de Envases para Reciclaje
 
-En construcción...
-
-
 ## Indice
 
 - [Acerca esta Dapp](#acerca-esta-dapp)
@@ -16,6 +13,11 @@ En construcción...
 - [Entorno](#entorno)
 - [¿Cómo instalar y ejecutar en local?](#cómo-instalar-y-ejecutar-en-local)
 - [Puntos evaluables](#puntos-evaluables)
+    - [Interfaz](#interfaz)
+    - [Librería](#libreria---utilizar-una-librería-existente-de-openzeppelin-o-ethpm)
+    - [Smart Contracts](#smart-contracts---uso-de-alg%C3%BAn-mecanismo-como-herencia-o-factory-contracts)
+    - [Testing](#testing---justifiación-test-creados-y-explicación-función-que-realizan-cada-uno)
+    - [Extras](#extras---alojar-ellos-contratos-en-una-testnet-y-verificar-el-código)
 
 ---
 
@@ -60,11 +62,11 @@ Este se compone de:
 
 ### Panel 'Recolección':
 
-Area donde el usuario deberá introducir los datos del envase a reciclar y a partir de los cuales se asignará en compensación un número determinado de tokens:
+Área donde el usuario deberá introducir los datos del envase a reciclar y a partir de los cuales se asignará en compensación un número determinado de tokens:
 
 Los campos son los siguientes:
 
-- **Código**: Codigo de barra que aparece en la etiqueta del envase a reciclar. Puede utilizarse cualquier código, sin embargo, los indicados en [Productos registrados](#productos-registrados) tienen una tarifa asignada y utilizan el oráculo para recuperar el número de tokens a asignar. Para el resto se entrega un token por unidad.
+- **Código**: Código de barra que aparece en la etiqueta del envase a reciclar. Puede utilizarse cualquier código, sin embargo, los indicados en [Productos registrados](#productos-registrados) tienen una tarifa asignada y utilizan el oráculo para recuperar el número de tokens a asignar. Para el resto se entrega un token por unidad.
 
 - **Descripción**: Se muestra la descripción asociada al código (si registrada).
 
@@ -82,7 +84,7 @@ Los campos son los siguientes:
 
 En esta área se muestran las últimas 5 transacciones realizadas con la cuenta con que se está trabajando.
 
-Los campos de la tabla de movimientos corresponde a los campos introducidos en el panel de _'Recolección'_.
+Los campos de la tabla de movimientos corresponden a los campos introducidos en el panel de _'Recolección'_.
 
 ![Últimas recolecciones](./images/ultimas_recolecciones.jpg)
 
@@ -156,22 +158,22 @@ Para más detalles, ver implementación de [parada de emergencia](#smart-contrac
 ---
 ## Estructura de la Dapp
 
-La estructura de directorios y ficheros son los siguientes:
+La estructura de directorios y ficheros es la siguiente:
 
 ````
 +-- app                         Archivos Javascript y plantilla HTML para nuestra Dapp (UI) 
-¦   +-- package.json            Configuración NPM para UI  
-¦   +-- dist                    
 ¦   +-- src  
 ¦       +-- index.html          +-- Plantilla HTML para la UI de la Dapp
 ¦       +-- index.js            +-- Codificación UI de la Dapp
-
+¦   +-- dist                    
+¦   +-- package.json            +-- Configuración NPM para UI  
+¦   +-- webpack.config.js       +-- Configuración para Webpack
 ¦  
 +-- build                       "Artifacts" u objetos generados en la compilación de los Smart Contracts  
 |   +-- contracts
 ¦  
-+-- contracts                   Archivos fuentes de los Smart Contracts  
-¦   +-- Recycler.sol            +-- **Smart Contract principal de la Dapp**  
++-- contracts                   Archivos fuentes de los Smart Contracts utilizados en la Dapp
+¦   +-- Recycler.sol            +-- Smart Contract principal de la Dapp  
 ¦   +-- Migrations.sol          +-- SC para la migración  
 ¦   +-- Ownable.sol             +-- SC de OpenZeppelin para gestionar el owner de un contrato 
 ¦   +-- Pausable.sol            +-- SC de OpenZeppelin para implementar paradas en contratos
@@ -185,14 +187,13 @@ La estructura de directorios y ficheros son los siguientes:
 +-- test                        Scripts para test unitarios  
 ¦   +-- recycler.js             +-- Tests para el contrato Recycler
 ¦  
-+-- truffle-config.js           Configuración para Truffle  
-+-- webpack.config.js           Configuración para Webpack
++-- truffle-config.js           +-- Configuración para Truffle  
 ````
 
 **En resumen:** 
-- La interfaz (UI) de la Dapp se ha construido con la plantilla HTML _index.html_ y la lógica codificada en el Javascript _index.js_.
-- Dentro de _Recycler.sol_ estan codificados los SC _Recycler_ y _UserFactory_. El SC principal es _Recycler_ y utiliza a _UserFactory_ para gestionar los movimientos de cada usuario (implementa la parte de _Factory Contracts_).
-- Las pruebas unitarias se han codificado en _recycler.js_.
+- La interfaz (UI) de la Dapp se ha construido con la plantilla HTML __index.html__ y la lógica codificada en el JavaScript __index.js__.
+- Dentro de __Recycler.sol__ están codificados los SC __Recycler__ y __UserFactory__. El SC principal es _Recycler_ y utiliza a _UserFactory_ para gestionar por separado los movimientos de cada usuario (implementa la parte de _Factory Contracts_).
+- Las pruebas unitarias se han codificado en __recycler.js__.
 
 ---
 ### Entorno
@@ -207,7 +208,7 @@ Se requiere tener instalado en el entorno el siguiente software:
 - Metamask
 - Ganache (opcional)
 
-Las versiones instalas al probar esta Dapp eran las siguientes:
+Las versiones instaladas al probar esta Dapp eran las siguientes:
 
 - Truffle v5.0.24  
 - Node v8.10.0  
@@ -222,55 +223,55 @@ Las versiones instalas al probar esta Dapp eran las siguientes:
 
 Para poder ejecutar en local es necesario realizar los siguientes pasos:
 
-1) Clonar el repositorio desde GitHub:
+**1)** Clonar el repositorio desde GitHub:
 
-    $ _git clone https://github.com/lealp22/DYDII_PEC1.git_
+    $ git clone https://github.com/lealp22/DYDII_PEC1.git
 
-2) Entrar al siguiente directorio e instalar dependencias:
+**2)** Entrar al siguiente directorio e instalar dependencias:
 
-    $ _cd DYDII_PEC1/app_
-    $ _npm install_
+    $ cd DYDII_PEC1/app
+    $ npm install
 
-3) Ejecutar Truffle:
+**3)** Ejecutar Truffle:
 
-    $ _truffle develop_
+    $ truffle develop
 
-    (En este punto también se podría utilizar _Ganache_, siempre que apunte a la dirección http://127.0.0.1:9545)
+>(En este punto también se podría utilizar _Ganache_, siempre que apunte a la dirección http://127.0.0.1:9545)
 
-4) Abrimos un nuevo terminal y desde el mismo directorio (DYDII_PEC1/app) ejecutamos:
+**4)** Abrimos un nuevo terminal y desde el mismo directorio (DYDII_PEC1/app) ejecutamos:
 
-    $ _npx ethereum-bridge -a 9 -H 127.0.0.1 -p 9545 --dev_
+    $ npx ethereum-bridge -a 9 -H 127.0.0.1 -p 9545 --dev
 
-    Con este paso se ejecuta el servicio _ethereum-bridge_, necesario para que el oráculo de la Dapp funciones en local
+>Con este paso se ejecuta el servicio _ethereum-bridge_, necesario para que el oráculo de la Dapp funciones en local
 
-    ![Ethereum bridge](./images/ethereum-bridge.jpg)g
+![Ethereum bridge](./images/ethereum-bridge.jpg)
 
-5) Compilar los Smart Contracts:
+**5)** Compilar los Smart Contracts:
 
-    Desde Truffle: > _compile_
-    Desde la línea de comandos (para _Ganache_): $ _truffle compile_
+    Desde Truffle: > compile
+    Desde la línea de comandos (Ganache): $ truffle compile
 
-6) Migrar los Smart Contracts:
+**6)** Migrar los Smart Contracts:
 
-    Desde Truffle: > _migrate_
-    Desde la línea de comandos (para _Ganache_): $ _truffle migrate_
+    Desde Truffle: > migrate
+    Desde la línea de comandos (Ganache): $ truffle migrate
 
-7) Ejecutamos el test unitario para comprobar el correcto funcionamiento:
+**7)** Ejecutamos el test unitario para comprobar el correcto funcionamiento:
 
-    Desde Truffle: > _test_
-    Desde la línea de comandos (para _Ganache_): $ _truffle test_    
+    Desde Truffle: > test
+    Desde la línea de comandos (Ganache_): $ truffle test
 
-8) Abrimos un nuevo terminal y, una vez ethereum-bridge esté escuchando, ejecutamos (desde el mismo directorio que en los pasos anteriores --DYDII_PEC1/app--):
+**8)** Abrimos un nuevo terminal y, una vez ethereum-bridge esté escuchando, ejecutamos (desde el mismo directorio que en los pasos anteriores --DYDII_PEC1/app--):
 
-    $ _npm run dev_
+    $ npm run dev
 
-    ![Comando finalizado](./images/run_dev.jpg)
+![Comando finalizado](./images/run_dev.jpg)
 
-9) Completado el paso anterior, ya podemos ejecutar la Dapp desde nuestro navegador con la siguiente url:
+**9)** Completado el paso anterior, ya podemos ejecutar la Dapp desde nuestro navegador con la siguiente url:
 
-    [http://localhost:8080](http://localhost:8080)
+>[http://localhost:8080](http://localhost:8080)
 
-> _Observación:_ Se aconseja importar la primera clave privada de la lista de cuentas a Metamask. De esta forma se podrá utilizar las funcionalidades disponibles unicamente para el _Owner_.
+__Observaciones:__ Se aconseja importar la primera clave privada de la lista de cuentas a Metamask. De esta forma se podrá utilizar las funcionalidades disponibles unicamente para el _Owner_.
 
 ![Truffle accounts](./images/truffle-accounts.jpg)
 
@@ -296,12 +297,11 @@ Para poder ejecutar en local es necesario realizar los siguientes pasos:
 
 Se ha utilizado la librería **Safemath.sol** de OpenZeppelin
 
-Su versión original se puede encontrar en:
-[https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/math/SafeMath.sol](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/math/SafeMath.sol)
+Su versión original se puede encontrar en [Github.com/OpenZeppelin/SafeMath.sol](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/math/SafeMath.sol).
 
 Sin embargo, se ha modificado para incluir dos funciones nuevas para la suma y resta de enteros de 32 bytes (para los contadores utilizados en _Recycler.sol_)
 
-Mencionar que esta librería no necesita ser desplegada por separado, por lo que no es necesario vincularla en el deploy de los contratos. Todas las funciones de _Safemath_ son _internal_, por lo que la EVM simplemente la incluye dentro del contrato.
+Mencionar que esta librería no necesita ser desplegada por separado, por lo que no es necesario vincularla en el deploy (_2_deploy_contracts.js_) de los contratos. Todas las funciones de _Safemath_ son _internal_, por lo que la EVM simplemente la incluye dentro del contrato.
 
 ---
 ## SMART CONTRACTS - Uso de algún mecanismo como Herencia o Factory Contracts
@@ -315,19 +315,17 @@ Se han utilizados los contratos de OpenZeppelin:
 
 - **Pausable.sol**
 
-Su versión original se puede encontrar en:
-[https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/lifecycle/Pausable.sol](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/lifecycle/Pausable.sol)
+Su versión original se puede encontrar en [GitHub.com/OpenZeppelin/Pausable.sol](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/lifecycle/Pausable.sol).
 
-> En nuestro caso se han hecho algunas modificaciones:
+>En nuestro caso se han hecho algunas modificaciones:
 >- Se simplifica para que el owner del contrato sea la única persona que pueda invocar las funciones _pause()_ y _unpause()_.
->- Se incluye herencia de _Ownable.sol_ para poder implementar el cambio anterior.
+- Se incluye herencia de _Ownable.sol_ para poder implementar el cambio anterior.
 
 - **Ownable.sol**
 
-Su versión original se puede encontrar en:
-[https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/ownership/Ownable.sol](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/ownership/Ownable.sol)
+Su versión original se puede encontrar en [GitHub.com/OpenZeppelin/Ownable.sol](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/ownership/Ownable.sol).
 
-> Se ha utilizado una versión antigua adaptada para que la dirección del owner sea payable y se le pueda transferir el saldo del contrato sin necesidad de hacer posteriores conversiones de la dirección (de _address_ a _address payable_).
+>Se ha utilizado una versión antigua adaptada para que la dirección del owner sea "payable" y se le pueda transferir el saldo del contrato sin necesidad de hacer posteriores conversiones de la dirección (de "address" a "address payable").
 
 También se ha utilizado el contrato de _Provable_:
 
@@ -335,23 +333,24 @@ También se ha utilizado el contrato de _Provable_:
 
 En este se incluye todos los contratos necesarios para trabajar con oráculos.
 
-Su versión original se puede encontrar en:
-[https://github.com/provable-things/ethereum-api/blob/master/provableAPI_0.5.sol](https://github.com/provable-things/ethereum-api/blob/master/provableAPI_0.5.sol)
+Su versión original se puede encontrar en [GitHub.com/Provable/provableAPI_0.5.sol](https://github.com/provable-things/ethereum-api/blob/master/provableAPI_0.5.sol)
 
 
 **En resumen:**
 * El contrato _Pausable_ hereda de _Ownable_  
-* El contrato _Recycler_ hereda de _Pausable_ y _usingProvable_ (en provableAPI_0.5.sol), implementando todas las funciones de estos tres contratos.
-
->_contract Pausable is Ownable_  (Pausable.sol)  
->_contract Recycler is usingProvable, Pausable_  (Recycler.sol)  
-
+````
+contract Pausable is Ownable (en Pausable.sol)
+````
+* El contrato _Recycler_ hereda de _Pausable_ y _usingProvable_ (en _provableAPI\_0.5.sol_), implementando todas las funciones de estos tres contratos (incluido _Ownable_).
+````
+contract Recycler is usingProvable, Pausable  (en Recycler.sol)
+````
 
 ### 2) Factory Contracts
 
 Se ha creado el contrato **UserFactory** (en _Recycler.sol_) encargado de gestionar por separado los movimientos de tokens de cada uno de los usuarios (direcciones) que utilicen la dapp.
 
-En el contrato _Recycler_, dentro de los datos de cada usuario (struct user), se incluye el _child contract_ (userContr) que gestionará sus movimientos:
+En el contrato _Recycler_, dentro de los datos de cada usuario (_struct user_), se incluye el "child contract" **userContr** que gestionará sus movimientos:
 ````
     //* Estructura para datos de usuarios
     struct User {
@@ -397,7 +396,7 @@ Esto es gestionado a través de los eventos **Paused()** y **Unpaused()**.
 Se han incluido los comentarios en Recycler.sol
 
 ---
-## TESTING - Justifiación test creados y explicación función que realizan cada uno.
+## TESTING - Justificación test creados y explicación función que realizan cada uno.
 
 **- Test "Se crea un usuario correctamente con el despliegue del contrato"**
 
@@ -414,7 +413,7 @@ Complementa el test anterior en intentar validar las acciones realizadas con el 
      
 Se valida que:
 - El saldo del primer usuario es 10.000 tokens (asignados en el constructor)
-- El usuario tiene registrada una transacción (movimiento) por dichos tokens
+- El usuario aún no tiene registrada ninguna transacción (movimiento)
 - Lo 10.000 tokens se reflejan en el saldo global de la Dapp
      
 
@@ -425,7 +424,7 @@ La prueba realiza una transferencia de tokens, que sería la función base de la
 Se valida que:
 - El saldo de la cuenta se incrementa en 5 tokens (10.005 tokens)
 - El saldo global también se incrementa en 5 tokens (10.005 tokens)
-- Se crea una nueva transacción (movimiento) para dicha cuenta (2 mvtos)
+- Se crea una nueva transacción (movimiento) para dicha cuenta (1º movimiento)
 - Que los valores de este movimiento coinciden con los enviados
        
 **- Test "Pago de tokens a una segunda cuenta con su alta en la Dapp y el registro del movimiento"**
@@ -453,9 +452,9 @@ Se valida que:
 - Que los valores enviados en el evento cointSent coinciden con los de la transferencia
        
   
-**- Test "LLama a una función de Pausable.sol para comprobar la herencia"**
+**- Test "Llama a una función de Pausable.sol para comprobar la herencia"**
      
-LLama a una función de Pausable.sol para comprobar que esta disponible y se puede ejecutar.
+Llama a una función de Pausable.sol para comprobar que esta disponible y se puede ejecutar.
      
 
 **- Test "Activar y desactivar la pausa (circuit break) de la Dapp"**
@@ -467,9 +466,9 @@ Se valida:
 - Se emiten los eventos correspondientes
      
   
-**- Test "LLama a una función de Ownable.sol para comprobar la herencia"**  
+**- Test "Llama a una función de Ownable.sol para comprobar la herencia"**  
      
-LLama a una función de Ownable.sol para comprobar que esté disponible y se puede ejecutar.
+Llama a una función de Ownable.sol para comprobar que esté disponible y se puede ejecutar.
      
 
 **- Test "Enviar y recibir Ethers"**
@@ -497,9 +496,7 @@ Se comprueba que:
 
 **Observaciones:**
 
-- No se ha podido automatizar el test para comprobar el correcto funcionamiento del
-  oráculo. Al haber un callback y necesitar de la utilización del _ethereum-bridge_
-  se ha descartado el test por la complejidad que requería. Sin embargo, sí que se ha probado que funciona correctamente en local desde el Front.
+No se ha automatizado el test unitario para comprobar el correcto funcionamiento del oráculo. Al ser necesario recibir un callback desde otro contrato y la utilización del _ethereum-bridge_, se ha descartado el test por la complejidad que requería. Sin embargo, sí que se ha probado que funciona correctamente en local desde el Front:
 
 ![Test utilizando el oráculo](./images/Screenshot_test_oraculo_local.jpg)
 
@@ -524,22 +521,26 @@ Los contratos han sido alojados en la testnet de Rinkeby. Su direcciones son:
 
 Los pasos para su desplieguen han sido:
 
-1. Ejecutar cliente Geth:
-> _\> geth --rinkeby --rpc --rpcapi db,eth,net,web3,personal --cache=1024 --rpcport 8545 --rpcaddr 127.0.0.1 --rpccorsdomain "*"_
+- Ejecutar cliente Geth:
 
-2. Despliegue utilizando Truffle:
-> _\> truffle migrate --network rinkeby_
+````
+> geth --rinkeby --rpc --rpcapi db,eth,net,web3,personal --cache=1024 --rpcport 8545 --rpcaddr 127.0.0.1 --rpccorsdomain "*"
+````
+
+- Despliegue utilizando Truffle:
+
+`> truffle migrate --network rinkeby_`
 
 Para verificar el código:
 
-- Calculamos el hash del "deployedBytecode" en _build/contracts/Recycler.json_ con el comando:
-> _\> web3.sha3("0x60806040526...fa417952c0029")_
+- Calculamos el hash del "deployedBytecode" del fichero  _build/contracts/Recycler.json_ con el comando:
+
+`> web3.sha3("0x60806040526...fa417952c0029")`
 
 Obteniendo el hash:
 _"0x6cbae00ec6eb5047c94215116b9e9c2601bde910bd04d016ec64baf983a98497"_
 
--Hacemos lo mismo con el bytecode disponible en [rinkeby.etherscan.io]
-(https://rinkeby.etherscan.io/address/0xa5ddccf4919e8aa895c8a533a184b12e93650074#code), obteniendo el mismo hash:  
+- Hacemos lo mismo con el bytecode disponible en [rinkeby.etherscan.io](https://rinkeby.etherscan.io/address/0xa5ddccf4919e8aa895c8a533a184b12e93650074#code) para el contrato _Recycler_, obteniendo el mismo hash:  
 _"0x6cbae00ec6eb5047c94215116b9e9c2601bde910bd04d016ec64baf983a98497"_
 
 ---
@@ -548,97 +549,137 @@ _"0x6cbae00ec6eb5047c94215116b9e9c2601bde910bd04d016ec64baf983a98497"_
 Una vez ejecutado el comando _npm run build_ y con todos los componentes listos para el despliegue en el directorio _app/dist_:
 
 - Ejecutamos IPFs en nuetra máquina
-> _> ipfs daemon_
+
+`> ipfs daemon`
 
 - Abrimos otro terminal y ejecutamos (desde el directorio _app_):
-> _> ipfs add -r dist/_
+
+`> ipfs add -r dist/`
 
 ![IPF](./images/ipfs1.jpg)
 
 - Tomamos hash de la última línea, el correspondiente al directorio /dist, y ejecutamos:
-> _> ipfs name publish QmTEfzAtgjEABvwPRDJ5PZta2eTFV6pEYDDnAY2dXzH1QH_
+
+`> ipfs name publish QmVX2cWws7FAj7AQPxkRBweQvYqKHDHvEwChLgawM3sfy7`
 
 ![IPF](./images/ipfs2.jpg)
 
 Para ejecutar la Dapp desde IPFS bastaría con ejecutar:
-https://ipfs.io/ipfs/QmTEfzAtgjEABvwPRDJ5PZta2eTFV6pEYDDnAY2dXzH1QH/index.html
+https://ipfs.io/ipfs/QmVX2cWws7FAj7AQPxkRBweQvYqKHDHvEwChLgawM3sfy/
 
----
+Al menos en IPFS local ha funcionado:
+
+[Dapp IPFS local](./images/Screenshot_4.jpg)
+
 ## EXTRAS - Utilizar ENS (no para referirse a un hash de Swarm)
-Detallar procedimiento y funcionamiento / caso de uso del ENS en la aplicación
 
-Desde el cliente geth ejecutamos el script ensutils-rinkeby.js:
+Utiizaremos ENS para construir una URL para IPFS y poder utilizar la Dapp que hemos alojado en el paso anterior. Para ello es necesario realizar los siguientes pasos:
 
-??????????????
-> loadScript("./ens/ensutils-rinkeby.js")
+- Desde el cliente geth ejecutamos el script ensutils-rinkeby.js:
 
-Dicho script lleva las direcciones para poder funcionar sobre Rinkedy:
+`> loadScript("./ens/ensutils-rinkeby.js")`
 
-- Línea 220: contract address: 0xe7410170f87102df0055eb195163a03b7f2bff4a
-- Línea 1314: publicResolver address: 0x5d20cf83cb385e06d2f2a892f9322cd4933eacdc
+> Dicho script lleva las direcciones para poder funcionar sobre Rinkedy:
+  - Línea 220: contract address: 0xe7410170f87102df0055eb195163a03b7f2bff4a
+  - Línea 1314: publicResolver address: 0x5d20cf83cb385e06d2f2a892f9322cd4933eacdc
 
-Comprobamos si el dominio .test que queremos reservar está disponible (si el valor devuelto es cero):
+- Comprobamos si el dominio .test que queremos reservar está disponible (si el valor devuelto es cero):
 
-> testRegistrar.expiryTimes(web3.sha3("midomain"))
+`> testRegistrar.expiryTimes(web3.sha3("midapp"))`
 
-Viendo está disponibel, procedemos a registrarlo:
+- Viendo que está disponible, procedemos a registrarlo:
 
-> testRegistrar.register(web3.sha3("midomain"), eth.accounts[0], {from: eth.accounts[0]})
+`> testRegistrar.register(web3.sha3("midapp"), eth.accounts[0], {from: eth.accounts[0]})`
 
-Indicamos cuál será el _Resolver_ (publicResolver) para este dominio:
-> ens.setResolver(namehash("midomain.test"), publicResolver.address, {from: eth.account
+Obtenemos el hash: _0x8eb0a6e89ea0770020925f1f3b257bfe0564dd5d394841ab18bf80f7b837d2ad_
 
-Convertimos el hash de IPFS obtenido anteriormenta a Hexadecimal con la ayuda de la siguiente herramienta de codificación:
+[Register](./images/ens1.jpg)
+
+- Indicamos cuál será el _Resolver_ (publicResolver) para este dominio:
+
+`> ens.setResolver(namehash("midapp.test"), publicResolver.address, {from: eth.accounts[0]})`
+
+Obtenemos el hash: _0x9a33d9fb7d7a117666cf5b49434bd8a19f471e7e6898453d16438c839d9a51dd_
+
+[setResolver](./images/ens2.jpg)
+
+- Convertimos el hash de IPFS obtenido anteriormenta (el del directorio _/dist_) a Hexadecimal con la ayuda de la siguiente herramienta de codificación:_
 
 https://codepen.io/phyrex/pen/MBzOGR
 
-![IPF](./images/IPFS4.jpg)
+![IPFS](./images/IPFS4.jpg)
 
-0x48c264c6f2e6310c9bc08118011674a30457beb39ff99652dc9d2b808e7ae196
+Obtenemos:
+_0x6aaa62120686f3b53dbae4782b32f8e589b8c8b99e87f1d99988a2c0e4a81f7e_
 
-Luego, le indicamos al Resolver cómo resolver o traducir el dominio que hemos registrado:
-> publicResolver.setAddr(namehash("midomain.test"), "0x48c264c6f2e6310c9bc08118011674a30457beb39ff99652dc9d2b808e7ae196", {from: eth.accounts[0]})
-?????????????????????????????????
+- Le indicamos al Resolver cómo resolver o traducir el contenido que hemos registrado:
+```
+> publicResolver.setContent(namehash("midapp.test"), "0x6aaa62120686f3b53dbae4782b32f8e589b8c8b99e87f1d99988a2c0e4a81f7e", {from: eth.accounts[0]})
+```
+Obtenemos:
+`0x8f1450227adbe73d040042270266a1fefc190c0de9484217637db2db20371eae`
 
-https://ipfs.io/ipfs/midomain.test/index.html
+![setContent](./images/ens3.jpg)
+
+- Confirmamos que el dominio se resuelve correctamente:
+`getContent("midapp.test")`
+
+[getContent](./images/ipfs5.jpg)
+
+Con esto, se debería poder ejecutar la Dapp con el siguiente link:
+https://ipfs.io/ipfs/midapp.test/
 
 ---
 ## EXTRAS - Uso de oráculos
 
 En la Dapp se utiliza un oráculo para recuperar el número de tokens que deben ser asignados a un usuario a cambio de la entrega de envases para su reciclado.
 
-El oráculo implementado es el de _Provable_ (antiguo Oraclize). Para ello ha sido necesario incluir en nuestro contrato princial _Recycler_ (Recycler.sol) la importación de:
-
-> import "./provableAPI_0.5.sol"
-
-> (Este fuente inluye los contratos usingProvable, solcChecker, ProvableI, OracleAddrResolverI, y las librerías Buffer, CBOR )
+El oráculo implementado es el de _Provable_ (antiguo Oraclize). Para ello ha sido necesario incluir en nuestro contrato principal _Recycler_ (Recycler.sol) la importación de:
+````
+import "./provableAPI_0.5.sol"
+````
+> (Inluye los contratos usingProvable, solcChecker, ProvableI, OracleAddrResolverI, y las librerías Buffer, CBOR )
 
 E incluimos la herencia de los métodos de usingProvable en nuestro contrato:
+````
+contract Recycler is usingProvable, Pausable {
+````
+La utilización del oráculo dentro de nuestro contrato se realiza con las funciones **fetchPrice()** y **\_\_callback()**. En la primera de ellas se envía la query al oráculo y la segunda es ejecutada con el 'callback' a nuestro contrato para devolver el resultado obtenido por el oráculo.
 
-> contract Recycler is **usingProvable**, Pausable {
+- **Función fetchPrice(\_fee)**
 
-La utilización del oráculo dentro de nuestro contrato se realiza con las funciones _fetchPrice()_ y _\_\_callback()_. En la primera de ellas se envía la query al oráculo y la segunda es ejecutada con el 'callback' a nuestro contrato para devolver el resultado obtenido por el oráculo.
-
-**Función fetchPrice(_fee)**
-
-Con el valor de la tarifa que recibamos (_fee) construimos la query:
-
-> string memory _url = string(abi.encodePacked("[URL] ['json(https://api.mlab.com/api/1/databases/productos/collections/fees?apiKey=${[decrypt] BPssDAFd3BExbW4l0ee1RNV45pvdhOita1bwVtTzVu7aRvHoFZhuNCuuZnC8wzm6GUQ3yTz18+B2vnoADbHHpRc9NcMb/YZOwXo0sJsM5paIGll6oYEqpjWMQQ3eEISzGkE0/JMIHiDyG1SpiYI3bYg=}).0.result.", _fee, ".price']"));
-
+Con el valor de la tarifa que recibamos (_\_fee_) construimos la query:
+````
+string memory _url = string(abi.encodePacked("[URL] ['json(https://api.mlab.com/api/1/databases/productos/collections/fees?apiKey=${[decrypt] BPssDAFd3BExbW4l0ee1RNV45pvdhOita1bwVtTzVu7aRvHoFZhuNCuuZnC8wzm6GUQ3yTz18+B2vnoADbHHpRc9NcMb/YZOwXo0sJsM5paIGll6oYEqpjWMQQ3eEISzGkE0/JMIHiDyG1SpiYI3bYg=}).0.result.", _fee, ".price']"));
+````
 Enviamos la query y guardamos el Id (_queryId_) para cuando recibamos la respuesta:
+````
+bytes32 queryId = provable_query("nested", _url, 350000);
+````
+Asociado a este guardamos los datos de la transacción en curso:
+````
+    //* Transacciones pendientes enviadas al Oráculo
+    mapping (bytes32 => PendingQuery) private pendingQueries;
 
-> bytes32 queryId = provable_query("nested", _url, 350000);
-
-Emite el evento _LogNewProvableQuery(message)_, donde _message_ indica si se envío la query o, por el contrario, el contrato no disponía de saldo suficiente.
+    //* Estructura para Transacciones pendientes enviadas al Oráculo
+    struct PendingQuery {
+        bool    isPending;
+        Mvt     transPending;
+        address senderContract;
+    }
+````
+Emite el evento __LogNewProvableQuery(message)__, donde _message_ indica si se envió la query o, por el contrario, el contrato no disponía de saldo suficiente.
 
 Mencionar que la Apikey de la Api utilizada ha sido cifrada con la clave pública de Provable a través de su servicio de ['Test query'](http://app.provable.xyz/home/test_query).
 
-**Función __callback(id, result)**
+- **Función __callback(id, result)**
 
-Una vez el oráculo obtiene los datos, hace el 'callback' a nuestro contrato indicando el Id de la query para la que devuelve el resultado.
+Una vez el oráculo obtiene los datos, hace el 'callback' a nuestro contrato indicando el Id de la query para la que devuelve el resultado (_result_).
 
-A partir de allí se continua con el flujo del proceso recogiendo los datos guardados asociados al Id y tratando el resultado. En concreto, se completa la información de la transacción multiplicando el resultado de la query por el número de unidades recicladas.
+Con ello recuperamos los datos del mapping _pendingQueries_ y se continua con el flujo del proceso para tratar el resultado. En concreto, se completa la información de la transacción multiplicando el valor obtenido del resultado de la query por el número de unidades recicladas.
 
-Emite el evento _LogPriceUpdated(result)_, donde _result_ es la respuesta devuelta por el oráculo.
+Emite el evento __LogPriceUpdated(result)__, donde _result_ es la respuesta devuelta por el oráculo.
 
-**Observaciones:** Es importante que el contrato disponga de saldo suficiente para poder pagar el gas necesario para el envío del _\_\_callback()_. Es por ello que en el fichero para la migración _2\_deploy\_contracts.js_ se incluye el parámetro **value**, para dotar al contrato con un saldo inicial de 1 Ether.
+**Observaciones:** Es importante que el contrato disponga de saldo suficiente para poder pagar el gas necesario para la ejecución del _\__callback()_. Es por ello que en el fichero para la migración **2\_deploy\_contracts.js** se incluye el parámetro **value**, para dotar al contrato con un saldo inicial de 1 Ether.
+
+---

@@ -208,13 +208,14 @@ contract Recycler is usingProvable, Pausable {
       * @dev Constructor
       */
     constructor() public payable {
-        //owner = msg.sender;
+
         createUser();
 
+        /** Se quita porque funciona sin problema en local pero falla al desplegar en Rinkeby
         //Se crea un movimiento justificante del abono de 10000 tokens
         users[msg.sender].countMvts = SafeMath.add32(users[msg.sender].countMvts, 1);
-        //** Esta línea funciona sin problema en local pero falla al desplegar en Rinkeby */
-        //users[msg.sender].userContr.addMovement("coinbase", "", 1, "UNI", 10000);
+        users[msg.sender].userContr.addMovement("coinbase", "", 1, "UNI", 10000);
+        */
         addBalance(msg.sender, 10000);
     }
 
@@ -451,14 +452,7 @@ contract Recycler is usingProvable, Pausable {
 
         owner.transfer(_amount);
     }
-    /*
-    function transfer() public payable onlyOwner {
-        require (address(this).balance >= msg.value, "not enough balance");
-        require (msg.value != 0, "value is zero");
 
-        owner.transfer(msg.value);
-    }
-    */
     /**
       * @dev Función para consultar los movimientos de una cuenta (uno por llamada)
       *      Se requiere la dirección de la cuenta y el indíce del movimiento

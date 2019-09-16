@@ -25,7 +25,7 @@ contract("Recycler", accounts => {
   /**
    *  Se valida que:
    *  - El saldo del primer usuario es 10.000 tokens (asignados en el constructor)
-   *  - El usuario tiene registrada una transacción (movimiento) por dichos tokens
+   *  - El usuario aún no tiene registrada ninguna transacción (movimiento)
    *  - Lo 10.000 tokens se reflejan en el saldo global de la Dapp
    */
   it("El sado de la primera cuenta y el sado global de la Dapp son 10000 token", async () => {
@@ -34,7 +34,7 @@ contract("Recycler", accounts => {
     const numMvts = await instance.getMovementCount.call(accounts[0]);
     const globalBalance = await instance.getGlobalBalance.call();
     assert.equal(balance.valueOf(), 10000, "La primera cuenta no tiene 10000 tokens");
-    assert.equal(numMvts.valueOf(), 1, "No existe movimiento justificante para los 10000 tokens");
+    assert.equal(numMvts.valueOf(), 0, "La cuenta ya tiene movimientos");
     assert.equal(globalBalance.valueOf(), 10000, "El sado global no es de 10000 tokens");
   });
 
@@ -44,7 +44,7 @@ contract("Recycler", accounts => {
    *  Se valida que:
    *  - El saldo de la cuenta se incrementa en 5 tokens (10.005 tokens)
    *  - El saldo global también se incrementa en 5 tokens (10.005 tokens)
-   *  - Se crea una nueva transacción (movimiento) para dicha cuenta (2 mvtos)
+   *  - Se crea una nueva transacción (movimiento) para dicha cuenta (1er mvto)
    *  - Que los valores de este movimiento coinciden con los enviados
    */  
   it("Pago de tokens a una cuenta y registro del movimiento", async () => {
@@ -59,11 +59,11 @@ contract("Recycler", accounts => {
     const balance = await instance.getBalance.call(accounts[0]);
     const globalBalance = await instance.getGlobalBalance.call();
     const mvtCount = await instance.getMovementCount.call(accounts[0]);
-    const mvt = await instance.getMovement.call(accounts[0], 2);
+    const mvt = await instance.getMovement.call(accounts[0], 1);
 
     assert.equal(balance.valueOf(), 10005, "La cuenta no tiene 10005 tokens");
     assert.equal(globalBalance.valueOf(), 10005, "El sado global no es de 10005 tokens");
-    assert.equal(mvtCount.valueOf(), 2, "No se ha contabilizado el movimiento");
+    assert.equal(mvtCount.valueOf(), 1, "No se ha contabilizado el movimiento");
     assert.equal(mvt[0], code, "El código del movimiento es distinto al enviado");
     assert.equal(mvt[1], fee, "La tarifa del movimiento es distinto al enviado");
     assert.equal(mvt[2], qty, "La cantidad del movimiento es distinta a la enviada");

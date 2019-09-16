@@ -263,7 +263,7 @@ const App = {
                 alert(error);
             } else {
                 console.info("Transaction hash: ", transactionHash);
-                showMessage("Transacción completada");
+                showMessage("Transacción completada. Espere confirmación.");
             }
         });
 
@@ -482,7 +482,7 @@ const App = {
                 alert(error);
             } else {
                 console.info("Transaction hash: ", transactionHash);
-                showMessage("Transacción completada");
+                showMessage("Transacción completada. Espere confirmación.");
             }
         });
 
@@ -498,7 +498,7 @@ const App = {
                 alert(error);
             } else {
                 console.info("Transaction hash: ", transactionHash);
-                showMessage("Transacción completada");
+                showMessage("Transacción completada. Espere confirmación.");
             }
         });
     }
