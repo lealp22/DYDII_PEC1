@@ -590,13 +590,14 @@ Una vez ejecutado el comando _npm run build_ y con todos los componentes listos 
 ![IPF](./images/ipfs2.jpg)
 
 Para ejecutar la Dapp desde IPFS bastaría con ejecutar:
-https://ipfs.io/ipfs/QmVX2cWws7FAj7AQPxkRBweQvYqKHDHvEwChLgawM3sfy/
+https://ipfs.io/ipfs/QmVX2cWws7FAj7AQPxkRBweQvYqKHDHvEwChLgawM3sfy7/
 
 Comentar que no he logrado ejecutar desde IPFS, pero al menos ha funcionado desde IPFS local:
 http://127.0.0.1:8080/ipfs/QmVX2cWws7FAj7AQPxkRBweQvYqKHDHvEwChLgawM3sfy7/
 
 ![Dapp IPFS local](./images/Screenshot_4.jpg)
 
+---
 ## EXTRAS - Utilizar ENS (no para referirse a un hash de Swarm)
 
 Utiizaremos ENS para construir una URL para IPFS y poder utilizar la Dapp que hemos alojado en el paso anterior. Para ello es necesario realizar los siguientes pasos:
