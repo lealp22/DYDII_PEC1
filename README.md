@@ -377,17 +377,44 @@ Esto es gestionado a través de los eventos **Paused()** y **Unpaused()**.
 ---
 ## SMART CONTRACTS - Medidas adoptadas en los contratos en cuanto a seguridad para evitar ataques típicos.
 
-- Se ha utilizado la librería _Safemath.sol_ para evitar el overflow/underflow en variables numericas.
+Las medidas de seguridad adoptadas son las siguientes:
+- Se ha utilizado la librería _Safemath.sol_ para controlar el desbordamiento _(overflows/underflows)_ en variables numéricas.
 
-- Todas las funciones en _Recycler.sol_ llamadas por otras funciones han sido definidas como internas.
+- Implementación de mecanismo de parada del contrato o _circuit-breaker_ para detener los cambios de estado y actualizaciones realizadas por el contrato. Este está restringido para ser activado únicamente por su _owner_.
 
-????????????????????????????
+- Se implementa una función _kill()_ para la detención definitiva del contrato. Solo puede ser ejecutado por el _owner_ cuando el contrato esté detenido (circuit-breaker activado) y el saldo global de tokens sea cero (ningún usuario deber perder sus tokens).
+
+- La función transfer únicamente transfiere los Ethers del contrato al _owner_.
+
+- Se incluye una función _fallback_ (función alternativa) para revertir llamadas inválidas al contrato (sin llamar a una función).
+
+- Los valores obtenidos de _now_ o _block.timestamp_, no son tomadas en cuenta para las decisiones del contrato, por lo que no tienen ningún impacto en la aplicación. No existe dependencia de “marca de tiempo” (_Timestamp Dependence_).
+
+- La gestión del _owner_ y _pausable_ (circuit-breaker) se hace a través de contratos públicos de OpenZeppelin ampliamente utilizados y contrastados.
+
+- Las función _addMovement()_ de actualización del contrato “child” _userFactory_ (implementación del Factory Contracts) está restringida para ser utilizado únicamente desde el contrato que le ha creado (no se utiliza _tx.origin_).
+
+- Al tratar la respuesta del oráculo, se utiliza el identificador de la petición y se valida que quien la envía sea una dirección válida del propio oráculo.
+
+- La Api Key de la Api utilizada en el oráculo ha sido cifrada utilizando la clave pública del proveedor Provable evitando quede visible en la blockchain.
+
+- No se manejan Ethers internamente (salvo para el saldo del contrato), lo que hace no rentable a muchos de los posibles ataques al ser mayor el coste de la transacciones que el beneficio económico obtenido.
+
+- Todas las funciones tienen marcada explícitamente la visibilidad (requerido por la versión 0.5.0 de Solc). Salvo para las funciones de consulta (_view_ o _pure_), se ha restringido tanto como ha sido posible la visibilidad de las funciones al exterior dejando como internas todas aquellas que solo deben ser llamadas desde el propio contrato. Por ejemplo, la funciones a través de la que se incrementa el saldo de token _sendCoin_cont()_ y _addBalance()_ o con la que se crea internamente un usuario --_createUser()_-- son internas.
+
+- Se han incluido validaciones de parámetros en las funciones para comprobar cumplen las condiciones mínimas necesarias.
 
 ---
 
 ## SMART CONTRACTS - Posibles patrones de actualización que usaría en el contrato (No es necesario realizar la implementación)
 
-????????????????????????????
+Algunos posibles patrones serían:
+
+- **Patrón “Checks-Effects-Interactions” (Comprobaciones-Efectos-Interacciones):** Para evitar posibles ataques del tipo Re-Entrancy se podría implementar este patrón en las funciones donde primero se realizan las verificaciones, luego, si se pasan todas las verificaciones, se realizan los cambios en las variables de estado del contrato actual y, como último paso, la interacción con otros contratos.
+
+- **Patrón “Fail-Safe Mode” (Modo a prueba de fallos):** Donde se incluyen ciertas autocomprobaciones dentro del contrato para que, si alguna de estas falla, el contrato cambia automáticamente a algún tipo de modo "a prueba de fallos", que, por ejemplo, deshabilitaría algunas funcionalidades del contrato.
+
+- **Patrón “Restricting Access” (Restricción de acceso):** Tal como lo indica su nombre, se restringe quienes puede realizar modificaciones en el estado del contrato o llamar a las funciones de este, limitando así las posibles direcciones que podrían utilizar el contrato o parte de su funcionalidad.
 
 ---
 
@@ -537,7 +564,7 @@ Para verificar el código:
 
 `> web3.sha3("0x60806040526...fa417952c0029")`
 
-Obteniendo el hash:
+Obteniendo el hash:  
 _"0x6cbae00ec6eb5047c94215116b9e9c2601bde910bd04d016ec64baf983a98497"_
 
 - Hacemos lo mismo con el bytecode disponible en [rinkeby.etherscan.io](https://rinkeby.etherscan.io/address/0xa5ddccf4919e8aa895c8a533a184b12e93650074#code) para el contrato _Recycler_, obteniendo el mismo hash:  
