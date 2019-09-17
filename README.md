@@ -90,9 +90,7 @@ Los campos de la tabla de movimientos corresponden a los campos introducidos en 
 
 Bajo esta tabla se muestra el número total de transacciones de la cuenta.
 
->_Observación_: 
->- La cuenta del _owner_ siempre tendrá una primera transacción con el código 'coinbase' que justifica los 10.000 tokens que le son entregados con el despliegue del contrato.
->- Actualmente se muestra en la columna _'Descripción'_ la tarifa que se haya utilizado para calcular los tokens. Esto se utiliza así para poder comprobar el valor devuelto por el oráculo.
+>__Observaciones__: Actualmente se muestra en la columna _'Descripción'_ la tarifa que se haya utilizado para calcular los tokens. Esto se utiliza así para poder comprobar el valor devuelto por el oráculo.
 
 ### Panel 'Información del Sistema':
 
@@ -104,7 +102,7 @@ En esta área se muestra información general del sistema:
 
 - **Owner**: Dirección del owner del contrato.
 
-- **Paused**: Indica el estado de la Dapp en cuanto a si se ha activado el 'circuit break'.
+- **Paused**: Indica el estado de la Dapp en cuanto a si se ha activado el 'circuit breaker'.
 
 - **Botón \[Pause]/\[Unpause]**: Botón que permite activar/desactivar la parada del sistema. Solo se habilita para el _owner_. Una vez activada solo se permiten realizar operaciones de consulta o detener por completo el contrato (funcionalidad no implementada en UI)
 
@@ -150,7 +148,7 @@ Para realizar una transacción tan solo será necesario introducir los datos en 
 
 > **Observación**: Si se utiliza el código de un [producto registrado](#productos-reistrados) se deberá esperar la respuesta del oráculo, por lo que la confirmación del paso 6 podrá tardar unos segundos. Se ruega paciencia.
 
-**Si el usuario es el owner**, también podrá activar el _circuit-break_ a través del botón \[Pause] que aparece en el panel de ["Información del Sistema"](#panel-información-del-sistema). Si por el contrario, este ya estuviese activado, el botón aparecerá con la etiqueta _"Unpause"_.
+**Si el usuario es el owner**, también podrá activar el _circuit breaker_ a través del botón \[Pause] que aparece en el panel de ["Información del Sistema"](#panel-información-del-sistema). Si por el contrario, este ya estuviese activado, el botón aparecerá con la etiqueta _"Unpause"_.
 
 Para más detalles, ver implementación de [parada de emergencia](#smart-contracts---implementar-una-parada-de-emergencia-en-el-contrato-circuit-breaker--emergency-stop).
 
@@ -380,9 +378,9 @@ Esto es gestionado a través de los eventos **Paused()** y **Unpaused()**.
 Las medidas de seguridad adoptadas son las siguientes:
 - Se ha utilizado la librería _Safemath.sol_ para controlar el desbordamiento _(overflows/underflows)_ en variables numéricas.
 
-- Implementación de mecanismo de parada del contrato o _circuit-breaker_ para detener los cambios de estado y actualizaciones realizadas por el contrato. Este está restringido para ser activado únicamente por su _owner_.
+- Implementación de mecanismo de parada del contrato o _circuit breaker_ para detener los cambios de estado y actualizaciones realizadas por el contrato. Este está restringido para ser activado únicamente por su _owner_.
 
-- Se implementa una función _kill()_ para la detención definitiva del contrato. Solo puede ser ejecutado por el _owner_ cuando el contrato esté detenido (circuit-breaker activado) y el saldo global de tokens sea cero (ningún usuario deber perder sus tokens).
+- Se implementa una función _kill()_ para la detención definitiva del contrato. Solo puede ser ejecutado por el _owner_ cuando el contrato esté detenido ("circuit breaker" activado) y el saldo global de tokens sea cero (ningún usuario deber perder sus tokens).
 
 - La función transfer únicamente transfiere los Ethers del contrato al _owner_.
 
@@ -390,7 +388,7 @@ Las medidas de seguridad adoptadas son las siguientes:
 
 - Los valores obtenidos de _now_ o _block.timestamp_, no son tomadas en cuenta para las decisiones del contrato, por lo que no tienen ningún impacto en la aplicación. No existe dependencia de “marca de tiempo” (_Timestamp Dependence_).
 
-- La gestión del _owner_ y _pausable_ (circuit-breaker) se hace a través de contratos públicos de OpenZeppelin ampliamente utilizados y contrastados.
+- La gestión del _owner_ y _pausable_ (circuit breaker) se hace a través de contratos públicos de OpenZeppelin ampliamente utilizados y contrastados.
 
 - Las función _addMovement()_ de actualización del contrato “child” _userFactory_ (implementación del Factory Contracts) está restringida para ser utilizado únicamente desde el contrato que le ha creado (no se utiliza _tx.origin_).
 
@@ -484,9 +482,9 @@ Se valida que:
 Llama a una función de Pausable.sol para comprobar que esta disponible y se puede ejecutar.
      
 
-**- Test "Activar y desactivar la pausa (circuit break) de la Dapp"**
+**- Test "Activar y desactivar la pausa (circuit breaker) de la Dapp"**
      
-En este test se activa y desactiva los estados (Pause/Unpause) con los que se implementa el "circuit break" de la Dapp.
+En este test se activa y desactiva los estados (Pause/Unpause) con los que se implementa el "circuit breaker" de la Dapp.
      
 Se valida:
 - El estado de la Dapp tras ejecutar cada una de las acciones (Pause y Unpause)
@@ -513,7 +511,7 @@ Se valida que el saldo inicial y final son iguales, mientras que el intermedio e
   
 **- Test "Se detiene el contrato (Pause) y se intenta enviar tokens"**
      
-Se detiene el contrato (Pause) para activar el "circuit break" y se valida que no se pueden realizarse transacciones
+Se detiene el contrato (Pause) para activar el "circuit breaker" y se valida que no se pueden realizarse transacciones
 
 Se comprueba que:
 - Cambia el estado del contrato (a paused)
@@ -523,7 +521,7 @@ Se comprueba que:
 
 **Observaciones:**
 
-No se ha automatizado el test unitario para comprobar el correcto funcionamiento del oráculo. Al ser necesario recibir un callback desde otro contrato y la utilización del _ethereum-bridge_, se ha descartado el test por la complejidad que requería. Sin embargo, sí que se ha probado que funciona correctamente en local desde el Front:
+No se ha automatizado el test unitario para comprobar el correcto funcionamiento del oráculo. Al ser necesario recibir un _callback_ desde otro contrato y la utilización de _ethereum-bridge_, se ha descartado el test por la complejidad que requería. Sin embargo, sí que se ha probado que funciona correctamente en local desde el Front:
 
 ![Test utilizando el oráculo](./images/Screenshot_test_oraculo_local.jpg)
 
@@ -594,9 +592,10 @@ Una vez ejecutado el comando _npm run build_ y con todos los componentes listos 
 Para ejecutar la Dapp desde IPFS bastaría con ejecutar:
 https://ipfs.io/ipfs/QmVX2cWws7FAj7AQPxkRBweQvYqKHDHvEwChLgawM3sfy/
 
-Al menos en IPFS local ha funcionado:
+Comentar que no he logrado ejecutar desde IPFS, pero al menos ha funcionado desde IPFS local:
+http://127.0.0.1:8080/ipfs/QmVX2cWws7FAj7AQPxkRBweQvYqKHDHvEwChLgawM3sfy7/
 
-[Dapp IPFS local](./images/Screenshot_4.jpg)
+![Dapp IPFS local](./images/Screenshot_4.jpg)
 
 ## EXTRAS - Utilizar ENS (no para referirse a un hash de Swarm)
 
@@ -607,8 +606,8 @@ Utiizaremos ENS para construir una URL para IPFS y poder utilizar la Dapp que he
 `> loadScript("./ens/ensutils-rinkeby.js")`
 
 > Dicho script lleva las direcciones para poder funcionar sobre Rinkedy:
-  - Línea 220: contract address: 0xe7410170f87102df0055eb195163a03b7f2bff4a
-  - Línea 1314: publicResolver address: 0x5d20cf83cb385e06d2f2a892f9322cd4933eacdc
+>- Línea 220: contract address: 0xe7410170f87102df0055eb195163a03b7f2bff4a
+>- Línea 1314: publicResolver address: 0x5d20cf83cb385e06d2f2a892f9322cd4933eacdc
 
 - Comprobamos si el dominio .test que queremos reservar está disponible (si el valor devuelto es cero):
 
@@ -620,7 +619,7 @@ Utiizaremos ENS para construir una URL para IPFS y poder utilizar la Dapp que he
 
 Obtenemos el hash: _0x8eb0a6e89ea0770020925f1f3b257bfe0564dd5d394841ab18bf80f7b837d2ad_
 
-[Register](./images/ens1.jpg)
+![Register](./images/ens1.jpg)
 
 - Indicamos cuál será el _Resolver_ (publicResolver) para este dominio:
 
@@ -628,7 +627,7 @@ Obtenemos el hash: _0x8eb0a6e89ea0770020925f1f3b257bfe0564dd5d394841ab18bf80f7b8
 
 Obtenemos el hash: _0x9a33d9fb7d7a117666cf5b49434bd8a19f471e7e6898453d16438c839d9a51dd_
 
-[setResolver](./images/ens2.jpg)
+![setResolver](./images/ens2.jpg)
 
 - Convertimos el hash de IPFS obtenido anteriormenta (el del directorio _/dist_) a Hexadecimal con la ayuda de la siguiente herramienta de codificación:_
 
@@ -636,24 +635,22 @@ https://codepen.io/phyrex/pen/MBzOGR
 
 ![IPFS](./images/IPFS4.jpg)
 
-Obtenemos:
-_0x6aaa62120686f3b53dbae4782b32f8e589b8c8b99e87f1d99988a2c0e4a81f7e_
+Obtenemos: _0x6aaa62120686f3b53dbae4782b32f8e589b8c8b99e87f1d99988a2c0e4a81f7e_
 
 - Le indicamos al Resolver cómo resolver o traducir el contenido que hemos registrado:
 ```
 > publicResolver.setContent(namehash("midapp.test"), "0x6aaa62120686f3b53dbae4782b32f8e589b8c8b99e87f1d99988a2c0e4a81f7e", {from: eth.accounts[0]})
 ```
-Obtenemos:
-`0x8f1450227adbe73d040042270266a1fefc190c0de9484217637db2db20371eae`
+Obtenemos: _0x8f1450227adbe73d040042270266a1fefc190c0de9484217637db2db20371eae_
 
 ![setContent](./images/ens3.jpg)
 
 - Confirmamos que el dominio se resuelve correctamente:
 `getContent("midapp.test")`
 
-[getContent](./images/ipfs5.jpg)
+![getContent](./images/ipfs5.jpg)
 
-Con esto, se debería poder ejecutar la Dapp con el siguiente link:
+Con esto, se debería poder ejecutar la Dapp con el siguiente link:  
 https://ipfs.io/ipfs/midapp.test/
 
 ---
@@ -683,7 +680,7 @@ Enviamos la query y guardamos el Id (_queryId_) para cuando recibamos la respues
 ````
 bytes32 queryId = provable_query("nested", _url, 350000);
 ````
-Asociado a este guardamos los datos de la transacción en curso:
+Asociado a este también guardamos los datos de la transacción en curso:
 ````
     //* Transacciones pendientes enviadas al Oráculo
     mapping (bytes32 => PendingQuery) private pendingQueries;

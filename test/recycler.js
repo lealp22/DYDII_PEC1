@@ -152,13 +152,13 @@ contract("Recycler", accounts => {
   });
 
   /**
-   *  Activa y desactiva los estados que implementan el "circuit break" de la Dapp
+   *  Activa y desactiva los estados que implementan el "circuit breaker" de la Dapp
    * 
    *  Se valida:
    *  - El estado de la Dapp tras ejecutar la acciones de Pause/Unpause
    *  - Se emiten los eventos correspondientes
    */
-  it("Activar y desactivar la pausa (circuit break) de la Dapp", async () => {
+  it("Activar y desactivar la pausa (circuit breaker) de la Dapp", async () => {
     
     let result1 = await instance.pause({
       from: accounts[0]
@@ -226,7 +226,7 @@ contract("Recycler", accounts => {
   });
 
   /**
-   *  Se detiene el contrato (Pause) para activar el "circuit break" y se valida
+   *  Se detiene el contrato (Pause) para activar el "circuit breaker" y se valida
    *  que no se pueden realizarse transacciones
    */
   it("Se detiene el contrato (Pause) y se intenta enviar tokens", async () => {
